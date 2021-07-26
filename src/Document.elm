@@ -24,6 +24,7 @@ type alias Document =
     , tags : List String
     , content : String
     , access : Access
+    , slug : Maybe String
     }
 
 
@@ -47,6 +48,8 @@ empty =
     , tags = []
     , content = ""
     , access = Private
+    , slug = Nothing
+
     }
 
 
