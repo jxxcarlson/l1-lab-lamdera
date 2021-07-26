@@ -1,0 +1,5 @@
+scripts:
+
+  update-vendor: cp -r ../L1/src/L1 vendor/
+
+  cloc: cloc --by-file --exclude-dir=Evergreen src/
