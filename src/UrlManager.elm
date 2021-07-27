@@ -22,8 +22,8 @@ handleDocId url =
         HomePage _ ->
             Cmd.none
 
-        DocUrl id ->
-            sendToBackend (GetDocumentById id)
+        DocUrl slug ->
+            sendToBackend (GetDocumentBySlug slug)
 
 
 

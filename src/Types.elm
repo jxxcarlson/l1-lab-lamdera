@@ -135,6 +135,7 @@ type ToBackend
     | GetUserDocuments String
     | GetDocumentsWithQuery (Maybe User) SearchTerm
     | GetDocumentById String
+    | GetDocumentBySlug String
     | GetDocumentByIdForGuest String
     | RegisterNewDocument Document
 

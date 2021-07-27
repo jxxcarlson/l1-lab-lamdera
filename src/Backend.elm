@@ -168,6 +168,20 @@ updateFromFrontend sessionId clientId msg model =
                         ]
                     )
 
+        GetDocumentBySlug slug ->
+            case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
+                Nothing ->
+                    ( model
+                    , sendToFrontend clientId (SendMessage <| "Could not find document: " ++ slug)
+                    )
+
+                Just doc ->
+                    ( model
+                    , Cmd.batch
+                        [ sendToFrontend clientId (SendDocument doc)
+                        ]
+                    )
+
         GetDocumentByIdForGuest id ->
             if String.left 2 id /= "g/" then
                 ( model, Cmd.none )
