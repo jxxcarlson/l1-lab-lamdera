@@ -69,33 +69,11 @@ docUrlParser =
     oneOf [ parseHomePage, docUrlUParser_ ]
 
 
-
---guestDocUrlParser : Parser DocUrl
---guestDocUrlParser =
---    succeed (\k -> DocUrlForGuest k)
---        |. symbol "/g/"
---        |= oneOf [ uuidParser, intParser ]
---identifierParser =
---    oneOf [ uuidParser, intParser ]
---
---docUrlParserForIndex : Parser DocUrl
---docUrlParserForIndex =
---    succeed (\k -> DocUrlForIndex k)
---        |. symbol "/i/"
---        |= oneOf [ uuidParser, intParser ]
-
-
 docUrlUParser_ : Parser DocUrl
 docUrlUParser_ =
     succeed (\k -> DocUrl k)
         |. symbol "/"
         |= oneOf [ uuidParser ]
-
-
-
---intParser : Parser Identifier
---intParser =
---    int |> map N
 
 
 uuidParser : Parser String

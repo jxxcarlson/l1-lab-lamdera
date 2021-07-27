@@ -172,7 +172,7 @@ updateFromFrontend sessionId clientId msg model =
             case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                 Nothing ->
                     ( model
-                    , sendToFrontend clientId (SendMessage <| "Could not find document: " ++ slug)
+                    , sendToFrontend clientId (SendMessage <| "Could not find document by slug: " ++ slug)
                     )
 
                 Just doc ->
