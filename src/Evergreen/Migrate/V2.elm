@@ -101,11 +101,15 @@ userIdentity old =
     }
 
 
+{-| Note type-checking
+-}
 credentialsIdentity : Evergreen.V1.Credentials.Credentials -> Evergreen.V2.Credentials.Credentials
 credentialsIdentity (Evergreen.V1.Credentials.V1 a b) =
     Evergreen.V2.Credentials.V1 a b
 
 
+{-| Note type-checking
+-}
 userDataIdentity : Evergreen.V1.Authentication.UserData -> Evergreen.V2.Authentication.UserData
 userDataIdentity { user, credentials } =
     { user = userIdentity user, credentials = credentialsIdentity credentials }
