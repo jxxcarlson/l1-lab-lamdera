@@ -1,5 +1,6 @@
 module Authentication exposing
     ( AuthenticationDict
+    , UserData
     , encryptForTransit
     , insert
     , users
