@@ -172,7 +172,7 @@ updateFromFrontend sessionId clientId msg model =
             case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                 Nothing ->
                     ( model
-                    , sendToFrontend clientId (SendMessage <| "Could not find document by slug: " ++ slug)
+                    , sendToFrontend clientId (SendMessage <| "Could not find document by slug (1): " ++ slug)
                     )
 
                 Just doc ->
@@ -182,15 +182,15 @@ updateFromFrontend sessionId clientId msg model =
                         ]
                     )
 
-        GetDocumentByIdForGuest id ->
-            if String.left 2 id /= "g/" then
+        GetDocumentByIdForGuest slug ->
+            if String.left 2 slug /= "g/" then
                 ( model, Cmd.none )
 
             else
-                case List.head (List.filter (\doc -> doc.id == String.dropLeft 2 id) model.documents) of
+                case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                     Nothing ->
                         ( model
-                        , sendToFrontend clientId (SendMessage <| "Could not find document: " ++ String.dropLeft 2 id)
+                        , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2): " ++ String.dropLeft 2 id)
                         )
 
                     Just doc ->
