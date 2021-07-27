@@ -1,10 +1,12 @@
 module Document exposing
     ( Access(..)
     , Document
+    , dateResidue
     , deletedMessage
     , empty
     , handleSearchCommand
     , makeHomePage
+    , makeSlug
     , search
     , setAccess
     , wordCount
@@ -12,6 +14,72 @@ module Document exposing
 
 import Time
 import User exposing (User)
+
+
+makeSlug : Time.Posix -> Document -> String
+makeSlug t doc =
+    doc.username
+        ++ "-"
+        ++ doc.title
+        ++ "-"
+        ++ dateResidue t
+        |> String.toLower
+        |> String.replace " " "-"
+
+
+dateResidue : Time.Posix -> String
+dateResidue t =
+    let
+        y =
+            Time.toYear Time.utc t
+
+        m =
+            Time.toMonth Time.utc t |> monthAsInt
+
+        d =
+            Time.toDay Time.utc t
+    in
+    [ String.fromInt y, String.fromInt m |> String.padLeft 2 '0', String.fromInt d |> String.padLeft 2 '0' ] |> String.join "-"
+
+
+monthAsInt : Time.Month -> Int
+monthAsInt month =
+    case month of
+        Time.Jan ->
+            1
+
+        Time.Feb ->
+            2
+
+        Time.Mar ->
+            3
+
+        Time.Apr ->
+            4
+
+        Time.May ->
+            5
+
+        Time.Jun ->
+            6
+
+        Time.Jul ->
+            7
+
+        Time.Aug ->
+            8
+
+        Time.Sep ->
+            9
+
+        Time.Oct ->
+            10
+
+        Time.Nov ->
+            11
+
+        Time.Dec ->
+            12
 
 
 type alias Document =
@@ -49,7 +117,6 @@ empty =
     , content = ""
     , access = Private
     , slug = Nothing
-
     }
 
 

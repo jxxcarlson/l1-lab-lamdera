@@ -4,12 +4,12 @@ import Authentication exposing (AuthenticationDict)
 import Browser exposing (UrlRequest)
 import Browser.Dom as Dom
 import Browser.Navigation exposing (Key)
-import Data exposing(DataDict)
+import Data exposing (DataDict)
 import Document exposing (Document)
 import Http
 import L1.Parser.AST
-import Time
 import Random
+import Time
 import Url exposing (Url)
 import User exposing (User)
 
@@ -18,7 +18,6 @@ type alias FrontendModel =
     { key : Key
     , url : Url
     , message : String
-
 
     -- ADMIN
     , users : List User
@@ -62,16 +61,15 @@ type alias BackendModel =
     , uuidCount : Int
     , randomAtmosphericInt : Maybe Int
 
-       -- DATA
-       , dataDict : DataDict
+    -- DATA
+    , dataDict : DataDict
 
-       -- USER
-       , authenticationDict : AuthenticationDict
+    -- USER
+    , authenticationDict : AuthenticationDict
 
     -- DOCUMENT
     , documents : List Document
     }
-
 
 
 type FrontendMsg
@@ -144,6 +142,7 @@ type ToBackend
 type BackendMsg
     = NoOpBackendMsg
     | GotAtomsphericRandomNumber (Result Http.Error String)
+    | Tick Time.Posix
 
 
 type ToFrontend

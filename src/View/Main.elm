@@ -1,12 +1,12 @@
 module View.Main exposing (view)
 
-import L1.API
 import Document exposing (Access(..), Document)
 import Element as E exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import L1.API
 import Types exposing (..)
 import View.Button as Button
 import View.Color as Color
@@ -57,9 +57,13 @@ footer model =
         ]
         [ Button.adminPopup model
         , View.Utility.showIfIsAdmin model Button.runTask
+
         --, Button.export
         , Button.exportToMarkown
+
         --, Button.printToPDF model
+        , E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]
+            (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG"))
         , messageRow model
         ]
 
@@ -73,8 +77,6 @@ messageRow model =
         , View.Style.fgGray 1.0
         ]
         [ E.text model.message, viewId model ]
-
-
 
 
 viewId model =
@@ -263,10 +265,10 @@ viewRendered model =
         , View.Utility.elementAttribute "id" "__RENDERED_TEXT__"
         ]
         [ View.Utility.katexCSS
-        , E.column [E.spacing 18, E.width (E.px ((panelWidth_ model) - 40))]
-        (L1.API.renderDocument (renderArgs model) model.counter model.currentDocument.content)
-
+        , E.column [ E.spacing 18, E.width (E.px (panelWidth_ model - 40)) ]
+            (L1.API.renderDocument (renderArgs model) model.counter model.currentDocument.content)
         ]
+
 
 renderArgs model =
     { width = panelWidth_ model - 140

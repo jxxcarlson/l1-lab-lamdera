@@ -9,9 +9,10 @@ import Document exposing (Access(..))
 import Lamdera exposing (ClientId, SessionId, sendToFrontend)
 import List.Extra
 import Random
+import Time
 import Token
 import Types exposing (..)
-import Time
+
 
 type alias Model =
     BackendModel
@@ -22,7 +23,7 @@ app =
         { init = init
         , update = update
         , updateFromFrontend = updateFromFrontend
-        , subscriptions = \m -> Sub.none
+        , subscriptions = \m -> Time.every 1000 Tick
         }
 
 
@@ -34,13 +35,13 @@ init =
       , randomSeed = Random.initialSeed 1234
       , uuidCount = 0
       , randomAtmosphericInt = Nothing
-            , currentTime = Time.millisToPosix 0
+      , currentTime = Time.millisToPosix 0
 
       -- DATA
       , dataDict = Dict.empty
 
       -- USER
-         , authenticationDict = Dict.empty
+      , authenticationDict = Dict.empty
 
       -- DOCUMENTS
       , documents =
@@ -63,6 +64,9 @@ update msg model =
         GotAtomsphericRandomNumber result ->
             Backend.Update.gotAtomsphericRandomNumber model result
 
+        Tick newTime ->
+            ( { model | currentTime = newTime }, Cmd.none )
+
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
@@ -74,7 +78,7 @@ updateFromFrontend sessionId clientId msg model =
         RunTask ->
             let
                 documents =
-                    List.map (\doc -> { doc | id = String.replace "." "-" doc.id }) model.documents
+                    List.map (\doc -> { doc | slug = Just (Document.makeSlug model.currentTime doc) }) model.documents
             in
             ( { model | documents = documents }, sendToFrontend clientId (SendMessage <| "doc ids remapped") )
 
@@ -120,7 +124,12 @@ updateFromFrontend sessionId clientId msg model =
                     Token.get model.randomSeed
 
                 doc =
-                    { doc_ | id = token }
+                    { doc_
+                        | id = token
+                        , created = model.currentTime
+                        , modified = model.currentTime
+                        , slug = Just (Document.makeSlug model.currentTime doc_)
+                    }
 
                 newDocuments =
                     doc :: model.documents
