@@ -1,6 +1,7 @@
 module Document exposing
     ( Access(..)
     , Document
+    , changeSlug
     , dateResidue
     , deletedMessage
     , empty
@@ -25,6 +26,27 @@ makeSlug t doc =
         ++ dateResidue t
         |> String.toLower
         |> String.replace " " "-"
+
+
+changeSlug : String -> String -> String
+changeSlug newTitle slug =
+    let
+        parts =
+            String.split "-" slug
+
+        n =
+            List.length parts
+
+        dateString =
+            List.drop (n - 3) parts |> String.join "-"
+
+        username =
+            List.take 1 parts
+
+        titleString =
+            newTitle |> String.toLower |> String.replace " " "-"
+    in
+    [ username, [ titleString ], [ dateString ] ] |> List.concat |> String.join "-"
 
 
 dateResidue : Time.Posix -> String

@@ -4,7 +4,6 @@ import Authentication
 import Browser exposing (UrlRequest(..))
 import Browser.Events
 import Browser.Navigation as Nav
-import L1.API
 import Config
 import Data
 import Document exposing (Access(..))
@@ -12,6 +11,7 @@ import File.Download as Download
 import Frontend.Cmd
 import Frontend.Update
 import Html exposing (Html)
+import L1.API
 import L1.Parser.AST
 import L1.Render.Markdown
 import Lamdera exposing (sendToBackend)
@@ -208,12 +208,13 @@ update msg model =
                     model.currentDocument
 
                 newTitle =
+                    L1.Parser.AST.getTitle str
 
-                   L1.Parser.AST.getTitle str
-
+                newSlug =
+                    Maybe.map (Document.changeSlug newTitle) document.slug |> Maybe.withDefault "SLUG"
 
                 newDocument =
-                    { document | content = str , title = newTitle}
+                    { document | content = str, title = newTitle, slug = Just newSlug }
 
                 documents =
                     List.Extra.setIf (\doc -> doc.id == newDocument.id) newDocument model.documents
@@ -224,6 +225,9 @@ update msg model =
 
         AskFoDocumentById id ->
             ( model, sendToBackend (GetDocumentById id) )
+
+        AskFoDocumentBySlug slug ->
+            ( model, sendToBackend (GetDocumentBySlug slug) )
 
         InputSearchKey str ->
             ( { model | inputSearchKey = str }, Cmd.none )
@@ -248,14 +252,13 @@ update msg model =
 
         ExportToMarkdown ->
             let
-               markdownText =
-                   L1.Render.Markdown.transformDocument model.currentDocument.content
-            
-               fileName =
-                   model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".md")
+                markdownText =
+                    L1.Render.Markdown.transformDocument model.currentDocument.content
+
+                fileName =
+                    model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".md")
             in
             ( model, Download.string fileName "text/markdown" markdownText )
-           
 
         Export ->
             let
@@ -265,10 +268,10 @@ update msg model =
             ( model, Download.string fileName "text/plain" model.currentDocument.content )
 
         PrintToPDF ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
 
         GotPdfLink result ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
 
         ChangePrintingState printingState ->
             let
@@ -299,13 +302,15 @@ update msg model =
             in
             ( Frontend.Update.updateCurrentDocument document model, Frontend.Cmd.saveDocument model document )
 
-        --CYT msg_ ->
-        --    case msg_ of
-        --        CYDocumentLink docId ->
-        --            ( model, sendToBackend (GetDocumentById docId) )
-        --
-        --        _ ->
-        --            ( model, Cmd.none )
+
+
+--CYT msg_ ->
+--    case msg_ of
+--        CYDocumentLink docId ->
+--            ( model, sendToBackend (GetDocumentById docId) )
+--
+--        _ ->
+--            ( model, Cmd.none )
 
 
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )

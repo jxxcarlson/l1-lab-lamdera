@@ -96,6 +96,7 @@ type FrontendMsg
     | NewDocument
     | ChangeDocumentDeleteStateFrom DocumentDeleteState
     | AskFoDocumentById String
+    | AskFoDocumentBySlug String
     | FetchDocuments SearchTerm
     | ExportToMarkdown
     | Export

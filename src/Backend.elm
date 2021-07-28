@@ -182,15 +182,22 @@ updateFromFrontend sessionId clientId msg model =
                         ]
                     )
 
-        GetDocumentByIdForGuest slug ->
-            if String.left 2 slug /= "g/" then
-                ( model, Cmd.none )
+        GetDocumentByIdForGuest fragment ->
+            if String.left 2 fragment /= "g/" then
+                ( model, sendToFrontend clientId (SendMessage <| "Bad url for guest access: " ++ fragment) )
 
             else
+                let
+                    slug =
+                        String.dropLeft 2 fragment
+
+                    _ =
+                        Debug.log "SLUGS" <| List.map .slug model.documents
+                in
                 case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                     Nothing ->
                         ( model
-                        , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2): " ++ String.dropLeft 2 slug)
+                        , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2): " ++ slug)
                         )
 
                     Just doc ->
