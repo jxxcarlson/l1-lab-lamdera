@@ -242,6 +242,7 @@ viewEditor_ model =
         [ E.height (E.px (panelHeight_ model))
         , E.width (E.px (panelWidth_ model))
         , Font.size 14
+        , View.Style.bgGray 0.96
         ]
         { onChange = InputText
         , text = model.currentDocument.content
@@ -255,7 +256,7 @@ viewRendered : Model -> Element FrontendMsg
 viewRendered model =
     E.column
         [ E.paddingEach { left = 24, right = 24, top = 12, bottom = 96 }
-        , View.Style.bgGray 0.9
+        , View.Style.bgGray 1.0
         , E.width (E.px (panelWidth_ model))
         , E.height (E.px (panelHeight_ model))
         , E.centerX
