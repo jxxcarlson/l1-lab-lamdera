@@ -190,9 +190,6 @@ updateFromFrontend sessionId clientId msg model =
                 let
                     slug =
                         String.dropLeft 2 fragment
-
-                    _ =
-                        Debug.log "SLUGS" <| List.map .slug model.documents
                 in
                 case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                     Nothing ->
