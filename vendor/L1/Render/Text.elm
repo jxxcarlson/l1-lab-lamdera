@@ -17,28 +17,19 @@ print element =
 
         Element (Name name) body _ ->
             if name == "math" then
-                "$" ++ print body ++ "$"
+                "$" ++ String.join " " (List.map print body) ++ "$"
 
             else
-                "[" ++ name ++ " " ++ print body ++ "]"
+                "[" ++ name ++ " " ++ String.join " " (List.map print body) ++ "]"
 
         Verbatim _ content _ ->
             content
 
-        Element Undefined body _ ->
-            "[" ++ "undefined" ++ print body ++ "]"
-
-        EList elements _ ->
-            String.join " " (List.map print elements)
+        Element UndefinedName body _ ->
+            "[" ++ "undefined" ++ String.join " " (List.map print body) ++ "]"
 
         Problem _ str ->
             "PROBLEM: " ++ str
-
-        StackError _ _ message errorText ->
-            message ++ ":  " ++ errorText
-
-        Empty ->
-            "EMPTY"
 
 
 print_ : Element_ -> String
@@ -48,25 +39,16 @@ print_ element =
             str
 
         Element_ (Name name) body ->
-            "[" ++ name ++ " " ++ print_ body ++ "]"
+            "[" ++ name ++ " " ++ String.join " " (List.map print_ body) ++ "]"
 
-        Element_ Undefined body ->
-            "[" ++ "undefined" ++ print_ body ++ "]"
+        Element_ UndefinedName body ->
+            "[" ++ "undefined" ++ String.join " " (List.map print_ body) ++ "]"
 
         Verbatim_ _ content ->
             content
 
-        EList_ elements ->
-            String.join " " (List.map print_ elements)
-
         Problem_ _ str ->
             "PROBLEM: " ++ str
-
-        StackError_ _ _ message errorText ->
-            "((" ++ message ++ ":  " ++ errorText ++ "))"
-
-        Incomplete_ ->
-            "EMPTY"
 
 
 printList_ : List Element_ -> String

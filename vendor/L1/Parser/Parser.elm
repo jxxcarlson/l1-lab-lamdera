@@ -1,10 +1,21 @@
-module L1.Parser.Parser exposing (hashMarks, parse, parseHeading, parseItem, parseList, parseSimple, parser)
+module L1.Parser.Parser exposing
+    ( elementName
+    , hashMarks
+    , identifier
+    , parse
+    , parseHeading
+    , parseItem
+    , parseList
+    , parseSimple
+    , parser
+    )
 
 import L1.Library.ParserTools as T
 import L1.Library.StringParser as XString
 import L1.Parser.AST as AST exposing (Element(..), Name(..), VerbatimType(..))
 import L1.Parser.Error exposing (Context(..), Problem(..))
 import L1.Parser.Loc as Loc exposing (Position)
+import List
 import Parser.Advanced as Parser exposing ((|.), (|=))
 
 
@@ -79,7 +90,7 @@ primitiveElement generation =
         Parser.succeed (\start name body_ end source -> Element name body_ (meta generation start end))
             |= Parser.getOffset
             |. leftBracket
-            |= Parser.oneOf [ elementName |> Parser.map Name, Parser.succeed Undefined ]
+            |= Parser.oneOf [ elementName |> Parser.map Name, Parser.succeed UndefinedName ]
             |= argsAndBody generation
             |. Parser.spaces
             |. rightBracket
@@ -126,7 +137,7 @@ quotedElement generation =
 headingParser generation =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start n elements end source -> Element (Name ("heading" ++ String.fromInt n)) (EList elements (meta generation start end)) (meta generation start end))
+        Parser.succeed (\start n elements end source -> Element (Name ("heading" ++ String.fromInt n)) elements (meta generation start end))
             |= Parser.getOffset
             |= hashMarks
             |. Parser.chompIf (\c -> c == ' ') ExpectingSpace
@@ -139,7 +150,7 @@ headingParser generation =
 itemParser generation =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start elements end source -> Element (Name "item") (EList elements (meta generation start end)) (meta generation start end))
+        Parser.succeed (\start elements end source -> Element (Name "item") elements (meta generation start end))
             |= Parser.getOffset
             |. colonMark
             |. Parser.chompWhile (\c -> c == ' ')
@@ -156,7 +167,7 @@ parseBlock generation str =
 blockParser generation =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start name elements end source -> Element (Name name.content) (EList elements (meta generation start end)) (meta generation start end))
+        Parser.succeed (\start name elements end source -> Element (Name name.content) elements (meta generation start end))
             |= Parser.getOffset
             |. pipeMark
             --|. Parser.spaces
@@ -181,10 +192,15 @@ hashMarks =
 
 
 elementName =
-    T.first (string_ [ '[', ']', ' ', '\n' ]) Parser.spaces
+    T.first identifier Parser.spaces
 
 
-argsAndBody : Int -> Parser.Parser Context Problem Element
+identifier =
+    T.text Char.isAlpha (\c -> not <| List.member c [ '[', ']', ' ', '\n' ])
+        |> Parser.map .content
+
+
+argsAndBody : Int -> Parser.Parser Context Problem (List Element)
 argsAndBody generation =
     Parser.inContext CArgsAndBody <| elementBody generation
 
@@ -195,7 +211,8 @@ metaOfList generation list =
 
 elementBody generation =
     Parser.inContext CBody <|
-        Parser.lazy (\_ -> T.many (parser generation) |> Parser.map (\list -> EList list (metaOfList generation list)))
+        -- Parser.lazy (\_ -> T.many (parser generation) |> Parser.map (\list -> EList list (metaOfList generation list)))
+        Parser.lazy (\_ -> T.many (parser generation))
 
 
 
