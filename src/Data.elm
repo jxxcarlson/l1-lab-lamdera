@@ -115,6 +115,9 @@ for i in range(0, years):
 
 Blocks must have at least one empy line above and below.  [quote blank] lines inside a block are permitted, but they cannot be [i empty]: put at least one space.  For more information about L1, see the articles [i The L1 Markup Language] and [i Fault-tolerant Parsing].
 
+For more information about L1, see [ilink "this document" "/s/jxxcarlson-the-l1-markup-language-2021-07-27"]
+
+
 ## Export
 
 At the moment there is an imperfect export-to-markdown feature.
