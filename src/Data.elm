@@ -37,7 +37,7 @@ notSigneInText =
 
 James Carlson (jxxcarlson@gmail.com)
 
-
+[blue [i Soon the items in the table of contents will be active links.]]
 
 ## About the App
 
