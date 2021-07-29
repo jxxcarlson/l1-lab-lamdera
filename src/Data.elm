@@ -1,20 +1,24 @@
-module Data exposing (
-     aboutCayatex
-    , docsNotFound, foo, notSignedIn, DataDict
+module Data exposing
+    ( DataDict
     , DataFile
     , DataId
     , Datum
+    , aboutCayatex
+    , docsNotFound
     , filter
     , fixUrls
+    , foo
     , insertDatum
     , make
+    , notSignedIn
     , remove
     , setupUser
     )
 
+import Dict exposing (Dict)
 import Document exposing (empty)
-import Dict exposing(Dict)
 import Time
+
 
 notSignedIn =
     { empty
@@ -27,19 +31,105 @@ notSignedIn =
 
 
 notSigneInText =
-    """
+    """# Welcome to L1
 
-[title Welcome!]
+[blue [i An experimental markup language.  Can change at any time!]]
+
+James Carlson (jxxcarlson@gmail.com)
+
 
 [blue [i Please sign in to create or work with your documents]]
 
 [violet [i To sign out, click the left-most button above: the one with your username.]]
 
-[fontRGB |100, 100, 100|  [b Note.] Export to LaTeX and create PDF features have been added.  This is a bleeding edge experimental feature which needs quite a bit of attention before it can be used for real work. Please do bear with us!]
+[image width:400 placement:center https://i.pinimg.com/originals/d4/07/a4/d407a45bcf3ade18468ac7ba633244b9.jpg]
 
-[fontRGB |100, 100, 100| As an example, this document can be successfully converted to PDF, but the image apppears on the next page.]
 
-[image |width: 400, placement: center|https://i.pinimg.com/originals/d4/07/a4/d407a45bcf3ade18468ac7ba633244b9.jpg]
+
+## About L1
+
+[b L1] is an experiment in markup language design and the construction of fault-tolerant parsers for them.  L1 documents are a mixture of ordinary text and elements:
+
+|| codeblock
+This is [b bold text.]
+And this is [i talic text.]
+
+The elements are the pieces of the form `[f x y ...]`, where `f` is the [i name] of the element and `x`, `y`, etc. are the elements of its [i body].  You can think of the body as a list whose items are either [quote words] or other elements, e.g., `[i italic [b bold-italic]]`, which is rendered as
+
+| indent
+[i italic [b bold-italic]]
+
+There are a few other bits of grammar.  First, there is in-line code and in-line math:
+
+|| codeblock
+`a[i] = b[i] + 1`
+$a^2 + b^2 = c^2$
+
+for code and math.  These render as `a[i] = b[i] + 1` and $a^2 + b^2 = c^2$.  Second, there are [i blocks], .e.g,
+
+|| codeblock
+|| mathblock
+\\int_0^1 x^n
+  =
+\\frac{1}{n+1}
+
+which is rendered as
+
+|| mathblock
+\\int_0^1 x^n
+  =
+\\frac{1}{n+1}
+
+There are also blocks for code:
+
+
+|| codeblock
+|| codeblock
+import sys
+"""
+        ++ String.fromChar '\u{00A0}'
+        ++ """
+capital = float(sys.argv[1])
+...
+
+which is rendered as
+
+|| codeblock
+import sys
+"""
+        ++ String.fromChar '\u{00A0}'
+        ++ """
+capital = float(sys.argv[1])
+rate = float(sys.argv[2])/100.0
+years = int(sys.argv[3])
+"""
+        ++ String.fromChar '\u{00A0}'
+        ++ """
+for i in range(0, years):
+  capital = (1 + rate)*capital
+  print "%3d %8.0f" % (i, capital)
+
+
+Blocks must have at least one empy line above and below.  [quote blank] lines inside a block are permitted, but they cannot be [i empty]: put at least one space.  For more information about L1, see the articles [i The L1 Markup Language] and [i Fault-tolerant Parsing].
+
+## Export
+
+At the moment there is an imperfect export-to-markdown feature.  This feature will always be [quote lossy], since L1 is more expressive than Markdown.  We plan to have export to LaTeX, and with it export to PDF.
+
+## Using L1
+
+For now, L1 should be used only for experimentation.  It is an experiment itself,
+and so will change as I discover mistakes in its design or discover a better design.
+
+## Design Philosophy
+
+Nonetheless, there is one overriding principle of design:
+[i the language shoud remain very simple, but with features that make it expressive and powerful.]
+Simplicity makes a language easy to learn and to use.  It also makes it easier to develop and maintain.
+
+
+
+
 
 """
 
@@ -83,8 +173,9 @@ foo =
         , id = "foo222"
     }
 
-----XXXX----
 
+
+----XXXX----
 
 
 type alias Username =
@@ -202,7 +293,7 @@ fixUrl url str =
         link =
             " [" ++ label ++ "](" ++ url ++ ")"
     in
-     String.replace url link str
+    String.replace url link str
 
 
 fixUrls : String -> String
