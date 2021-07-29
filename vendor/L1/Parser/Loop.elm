@@ -1,13 +1,13 @@
-module L1.Parser.Loop exposing (nextCursor, operation, parseLoop)
+module L1.Parser.Loop exposing (nextCursor, parseLoop)
 
 import L1.Library.Console as Console
 import L1.Library.ParserTools as ParserTools exposing (StringData)
 import L1.Parser.AST as AST exposing (Element(..), Name(..))
-import L1.Parser.Branch as Branch exposing (Operation(..), branch)
 import L1.Parser.Config as Config exposing (Configuration, EType(..))
 import L1.Parser.Configuration as Configuration
 import L1.Parser.Error exposing (Context, Problem)
 import L1.Parser.Handle as Handle
+import L1.Parser.Operation as Branch exposing (Operation(..), ReduceOperation(..), ShiftOperation(..), operation)
 import L1.Parser.Print
 import L1.Parser.Stack as Stack exposing (StackItem(..))
 import L1.Parser.TextCursor as TextCursor exposing (ScannerType(..), TextCursor)
@@ -55,16 +55,6 @@ nextCursor parser cursor =
         Shift op ->
             shift op parser cursor
 
-        --
-        --<<<<<<< HEAD
-        --    else
-        --        let
-        --            _ =
-        --                Debug.log (L1.Parser.Print.print cursor) ""
-        --
-        --            textToProcess =
-        --                String.dropLeft cursor.scanPoint cursor.source
-        --=======
         Reduce op ->
             reduce op parser cursor
 
@@ -79,110 +69,40 @@ shift op parse cursor =
                     , stack = Stack.TextItem { content = str.content, position = { start = 0, end = String.length str.content } } :: cursor.stack
                     , scanPoint = cursor.scanPoint + String.length str.content
                     , parsed = []
+                    , message = "PUSH(t)"
                 }
 
-        PushData data ->
+        PushSymbol data ->
             push cursor data
 
 
 reduce : ReduceOperation -> (String -> Element) -> TextCursor -> ParserTools.Step TextCursor TextCursor
 reduce op parser cursor =
     case op of
-        REnd ->
+        End ->
             ParserTools.Done { cursor | complete = cursor.parsed ++ cursor.complete, message = "COMMIT 1" }
 
-        RCommit ->
+        Commit ->
             ParserTools.Loop (TextCursor.commit parser { cursor | message = "COMMIT 2", count = cursor.count + 1 })
 
-        RHandleError ->
+        HandleError ->
             ParserTools.Loop (TextCursor.commit parser { cursor | message = "COMMIT 3", count = cursor.count + 1 })
 
-        RAdd strData ->
+        Add strData ->
             ParserTools.Loop
                 { cursor
                     | count = cursor.count + 1
                     , scanPoint = cursor.scanPoint + String.length strData.content
                     , complete = parser strData.content :: cursor.parsed ++ cursor.complete
                     , parsed = []
-                    , message = "R ADD" -- main
+                    , message = "ADD" -- main
                 }
 
-        RPop prefix ->
+        Pop prefix ->
             pop parser prefix cursor
 
-        RShortCircuit str ->
+        ShortCircuit str ->
             shortcircuit str cursor
-
-
-operation : TextCursor -> Operation
-operation cursor =
-    let
-        --_ =
-        --    Debug.log (L1.Parser.Print.print cursor) ""
-        textToProcess =
-            String.dropLeft cursor.scanPoint cursor.source
-
-        chompedText =
-            TextCursor.advance cursor textToProcess
-
-        maybeFirstChar =
-            String.uncons textToProcess |> Maybe.map Tuple.first
-
-        maybePrefix =
-            Maybe.map ((\c -> ParserTools.prefixWith c textToProcess) >> .content) maybeFirstChar
-    in
-    case ( maybeFirstChar, maybePrefix, cursor.stack ) of
-        ( Nothing, _, [] ) ->
-            Reduce REnd
-
-        ( Nothing, _, _ ) ->
-            -- NEED TO RESOLVE ERROR: at end of input (Nothing), stack is NOT empty
-            Reduce RHandleError
-
-        ( _, Nothing, _ ) ->
-            -- WHAT THE HECK?  MAYBE WE SHOULD JUST BAIL OUT
-            Reduce RCommit
-
-        ( Just firstChar, Just prefixx, _ ) ->
-            -- CONTINUE NORMAL PROCESSING
-            case branch Configuration.configuration cursor firstChar prefixx of
-                ADD ->
-                    if cursor.stack == [] then
-                        Reduce (RAdd chompedText)
-
-                    else
-                        Shift (PushText chompedText)
-
-                PUSH data ->
-                    Shift (PushData data)
-
-                POP ->
-                    Reduce (RPop prefixx)
-
-                SHORTCIRCUIT ->
-                    Reduce (RShortCircuit prefixx)
-
-                COMMIT ->
-                    Reduce RCommit
-
-
-type Operation
-    = Reduce ReduceOperation
-    | Shift ShiftOperation
-
-
-type ReduceOperation
-    = REnd
-    | RCommit
-    | RHandleError
-    | RAdd StringData
-    | RPop String
-    | RShortCircuit String
-
-
-type ShiftOperation
-    = PushText StringData
-    | PushData { prefix : String, isMatch : Bool }
 
 
 pop parser prefix cursor =
@@ -196,7 +116,7 @@ push cursor ({ prefix, isMatch } as prefixData) =
             ParserTools.Loop <|
                 TextCursor.push prefixData
                     (TextCursor.EndMark_ prefix)
-                    { cursor | message = "PUSH E" }
+                    { cursor | message = "PUSH(e)" }
 
         Just expectation ->
             let
@@ -210,25 +130,25 @@ push cursor ({ prefix, isMatch } as prefixData) =
                         NormalScan
             in
             ParserTools.Loop <|
-                TextCursor.push prefixData (TextCursor.Expect_ expectation) { cursor | message = "PUSH", scannerType = scannerType }
+                TextCursor.push prefixData (TextCursor.Expect_ expectation) { cursor | message = "PUSH(s)", scannerType = scannerType }
 
 
 shortcircuit prefix cursor =
     if List.member prefix [ "#", "##", "###", "####" ] then
-        ParserTools.Done <| Handle.heading2 cursor
+        ParserTools.Done <| Handle.heading2 { cursor | message = "SHORT(h)" }
 
     else if prefix == ":" then
-        ParserTools.Done <| Handle.item cursor
+        ParserTools.Done <| Handle.item { cursor | message = "SHORT(:)" }
 
     else if prefix == "|" then
-        ParserTools.Done <| Handle.pipe cursor
+        ParserTools.Done <| Handle.pipe { cursor | message = "SHORT(|)" }
 
     else if prefix == "||" then
-        ParserTools.Done <| Handle.doublePipe cursor
+        ParserTools.Done <| Handle.doublePipe { cursor | message = "SHORT(||)" }
 
     else
-        ParserTools.Done cursor
+        ParserTools.Done { cursor | message = "SHORT(?)" }
 
 
 error cursor =
-    ParserTools.Done { cursor | message = "Unexpected error: no corresponding expectation" }
+    ParserTools.Done { cursor | message = "ERROR" }
