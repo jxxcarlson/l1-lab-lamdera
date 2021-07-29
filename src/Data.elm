@@ -37,8 +37,6 @@ notSigneInText =
 
 James Carlson (jxxcarlson@gmail.com)
 
-[blue [i Soon the items in the table of contents will be active links.]]
-
 ## About the App
 
 As guest, click [b Fetch] to fetch documents.  Guests have access to public documents.  Put [quote :public]
