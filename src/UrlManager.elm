@@ -32,10 +32,6 @@ handleDocId url =
 
 getInternalRef : String -> Maybe String
 getInternalRef str =
-    let
-        _ =
-            Debug.log "getInternalRef" str
-    in
     case run parseInternalRef str of
         Ok str_ ->
             Just str_
