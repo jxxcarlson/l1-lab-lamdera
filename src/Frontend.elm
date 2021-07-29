@@ -84,7 +84,7 @@ init url key =
 initialSearchKey : Url -> String
 initialSearchKey url =
     if urlIsForGuest url then
-        ""
+        ":public"
 
     else
         ":me"
@@ -195,7 +195,7 @@ update msg model =
             )
 
         GrantGuestAccess ->
-            ( { model | currentUser = Just User.guest }, Cmd.none )
+            ( { model | currentUser = Just User.guest, inputSearchKey = ":public" }, Cmd.none )
 
         -- ADMIN
         AdminRunTask ->

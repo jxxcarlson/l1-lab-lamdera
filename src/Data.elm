@@ -38,11 +38,16 @@ notSigneInText =
 James Carlson (jxxcarlson@gmail.com)
 
 
-[blue [i Please sign in to create or work with your documents]]
+
+## About the App
+
+As guest, click [b Fetch] to fetch documents.  Guests have access to public documents.  Put [quote :public]
+in the search field to fetch all public documents.  Put [quote atom] to search for documents about atoms.  Etc.
+
+[blue [i Create an account to experiment with documents. Just put in a username and password and click [b Sign in].]]
 
 [violet [i To sign out, click the left-most button above: the one with your username.]]
 
-[image width:400 placement:center https://i.pinimg.com/originals/d4/07/a4/d407a45bcf3ade18468ac7ba633244b9.jpg]
 
 
 
@@ -114,7 +119,9 @@ Blocks must have at least one empy line above and below.  [quote blank] lines in
 
 ## Export
 
-At the moment there is an imperfect export-to-markdown feature.  This feature will always be [quote lossy], since L1 is more expressive than Markdown.  We plan to have export to LaTeX, and with it export to PDF.
+At the moment there is an imperfect export-to-markdown feature.
+This feature will always be [quote lossy], since L1 is more expressive than Markdown.
+We plan to have export to LaTeX, and with it export to PDF.
 
 ## Using L1
 
@@ -127,8 +134,9 @@ Nonetheless, there is one overriding principle of design:
 [i the language shoud remain very simple, but with features that make it expressive and powerful.]
 Simplicity makes a language easy to learn and to use.  It also makes it easier to develop and maintain.
 
+## The L1 Mascot
 
-
+[image "width:400" "placement:center" "https://i.pinimg.com/originals/d4/07/a4/d407a45bcf3ade18468ac7ba633244b9.jpg"]
 
 
 """
