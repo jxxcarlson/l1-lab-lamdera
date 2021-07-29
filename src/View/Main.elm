@@ -98,7 +98,8 @@ notSignedInHeader model =
         [ E.spacing 12
         , Font.size 14
         ]
-        [ Button.signIn
+        [ Button.grantGuestAccess
+        , Button.signIn
         , View.Input.usernameInput model
         , View.Input.passwordInput model
         , E.el [ E.height (E.px 31), E.paddingXY 12 3, Background.color Color.paleBlue ]

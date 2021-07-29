@@ -87,6 +87,7 @@ type FrontendMsg
     | SignOut
     | InputUsername String
     | InputPassword String
+    | GrantGuestAccess
       -- ADMIN
     | AdminRunTask
     | GetUsers

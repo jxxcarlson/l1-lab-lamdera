@@ -194,6 +194,9 @@ update msg model =
             , Cmd.none
             )
 
+        GrantGuestAccess ->
+            ( { model | currentUser = Just User.guest }, Cmd.none )
+
         -- ADMIN
         AdminRunTask ->
             ( model, sendToBackend RunTask )

@@ -6,6 +6,7 @@ module View.Button exposing
     , fetchDocuments
     , getDocument
     , getUsers
+    , grantGuestAccess
     , help
     , linkTemplate
     , newDocument
@@ -158,6 +159,11 @@ fetchDocuments query =
 newDocument : Element FrontendMsg
 newDocument =
     buttonTemplate [] NewDocument "New"
+
+
+grantGuestAccess : Element FrontendMsg
+grantGuestAccess =
+    buttonTemplate [] GrantGuestAccess "Sign in as Guest"
 
 
 help =
