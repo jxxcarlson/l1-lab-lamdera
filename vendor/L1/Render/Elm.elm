@@ -224,11 +224,15 @@ tocItem : Element -> E.Element msg
 tocItem e =
     case AST.getTextList2 e of
         n :: content :: rest ->
-            el [ paddingEach { left = tocPadding n, right = 0, top = 0, bottom = 0 } ] (text content)
+            el [ paddingEach { left = tocPadding n, right = 0, top = 0, bottom = 0 }, Font.color (E.rgb255 46 33 194)]
+              (E.link [  ] { url = internalLink content, label = (text content) })
 
         _ ->
             E.none
 
+internalLink : String -> String
+internalLink str =
+    "#" ++ str |> String.toLower |> String.replace " " "-"
 
 tocPadding : String -> Int
 tocPadding str =
@@ -331,25 +335,31 @@ padLeft element =
 
 --    E.paddingEach { left = k, right = 0, top = 0, bottom = 0 }
 
+makeId elements =
+    htmlAttribute "id" (makeId_ elements)
+
+makeId_ : List Element -> String
+makeId_ elements =
+    elements |> List.map AST.getTextList2 |> List.concat |> String.join "-" |> String.toLower |> String.replace " " "-"
 
 heading1 : FRender msg
 heading1 renderArgs name body =
-    column [ Font.size (headerFontSize 1), headerPadding 1 ] (renderList renderArgs body)
+    column [ Font.size (headerFontSize 1), headerPadding 1 , htmlAttribute "id" "title"  ] (renderList renderArgs body)
 
 
 heading2 : FRender msg
 heading2 renderArgs name body =
-    column [ Font.size (headerFontSize 2), headerPadding 2 ] (renderList renderArgs body)
+    column [ Font.size (headerFontSize 2), headerPadding 2 , makeId body  ] [E.link [] {url = "#title", label = column [] (renderList renderArgs body)}]
 
 
 heading3 : FRender msg
 heading3 renderArgs name body =
-    column [ Font.size (headerFontSize 3), headerPadding 3 ] (renderList renderArgs body)
+    column [ Font.size (headerFontSize 3), headerPadding 3 , makeId body  ] [E.link [] {url = "#title", label = column [] (renderList renderArgs body)}]
 
 
 heading4 : FRender msg
 heading4 renderArgs name body =
-    column [ Font.size (headerFontSize 4), headerPadding 4 ] (renderList renderArgs body)
+    column [ Font.size (headerFontSize 4), headerPadding 4  , makeId body ] [E.link [] {url = "#title", label = column [] (renderList renderArgs body)}]
 
 
 getFactor level =

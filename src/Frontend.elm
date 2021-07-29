@@ -112,6 +112,10 @@ update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
 update msg model =
     case msg of
         UrlClicked urlRequest ->
+            let
+                _ =
+                    Debug.log "XXX urlRequest" urlRequest
+            in
             case urlRequest of
                 Internal url ->
                     let
@@ -131,6 +135,10 @@ update msg model =
                     )
 
         UrlChanged url ->
+            let
+                _ =
+                    Debug.log "XXX UrlChanged" url
+            in
             -- ( model, Cmd.none )
             ( { model | url = url }
             , Cmd.batch
