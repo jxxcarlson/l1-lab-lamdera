@@ -46,10 +46,10 @@ newDocument model =
                             | title = "New Document"
                             , author = user.realname
                             , username = user.username
-                            , content = "[title New Document]"
+                            , content = "# New Document"
                         }
                 in
-                ( model, sendToBackend (RegisterNewDocument doc) )
+                ( { model | showEditor = True }, sendToBackend (RegisterNewDocument doc) )
 
 
 deleteDocument : FrontendModel -> ( FrontendModel, Cmd FrontendMsg )

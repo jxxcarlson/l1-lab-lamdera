@@ -242,7 +242,7 @@ viewEditor_ model =
         [ E.height (E.px (panelHeight_ model))
         , E.width (E.px (panelWidth_ model))
         , Font.size 14
-        , View.Style.bgGray 0.96
+        , Background.color (E.rgb255 240 241 255)
         ]
         { onChange = InputText
         , text = model.currentDocument.content
