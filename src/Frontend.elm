@@ -121,7 +121,11 @@ update msg model =
                                     View.Utility.setViewportForElement id
 
                                 Nothing ->
-                                    Nav.pushUrl model.key (Url.toString url)
+                                    if String.left 2 url.path == "/s" then
+                                        sendToBackend (GetDocumentBySlug (String.dropLeft 3 url.path))
+
+                                    else
+                                        Nav.pushUrl model.key (Url.toString url)
                     in
                     ( model, cmd )
 

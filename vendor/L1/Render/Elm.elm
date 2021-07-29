@@ -71,6 +71,7 @@ renderElementDict =
         , ( "indent", indent )
         , ( "mb", mathblock )
         , ( "link", link )
+        , ( "ilink", ilink )
         , ( "image", image )
         , ( "heading1", heading1 )
         , ( "heading2", heading2 )
@@ -314,11 +315,27 @@ fontRGB renderArgs _ body =
             paragraph [ Font.color (E.rgb255 r g b), E.paddingXY 4 2 ] (List.map (render renderArgs) realBody)
 
 
+getArgs body =
+    List.map AST.getTextList2 body |> List.concat |> List.map String.trim |> List.filter (\s -> s /= "")
+
 link : FRender msg
 link renderArgs name body =
-    case List.map AST.getText body of
+    case getArgs body of
         label :: url :: rest ->
             E.newTabLink []
+                { url = url
+                , label = el [ Font.color linkColor, Font.italic ] (text <| label)
+                }
+
+        _ ->
+            E.el [] (text "Invalid link")
+
+
+ilink : FRender msg
+ilink renderArgs name body =
+    case getArgs body  of
+        label :: url :: rest ->
+            E.link []
                 { url = url
                 , label = el [ Font.color linkColor, Font.italic ] (text <| label)
                 }
