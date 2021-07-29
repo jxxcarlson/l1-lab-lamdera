@@ -115,6 +115,12 @@ update msg model =
             case urlRequest of
                 Internal url ->
                     let
+                        _ =
+                            Debug.log "urlRequest" urlRequest
+
+                        _ =
+                            Debug.log "SLUG" (String.dropLeft 3 url.path)
+
                         cmd =
                             case .fragment url of
                                 Just id ->
