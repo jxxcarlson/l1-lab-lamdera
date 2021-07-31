@@ -3,7 +3,7 @@ module Evergreen.V19.User exposing (..)
 import Time
 
 
-type alias User = 
+type alias User =
     { username : String
     , id : String
     , realname : String

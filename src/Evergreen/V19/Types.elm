@@ -37,8 +37,8 @@ type alias FrontendModel =
     { key : Browser.Navigation.Key
     , url : Url.Url
     , message : String
-    , users : (List Evergreen.V19.User.User)
-    , currentUser : (Maybe Evergreen.V19.User.User)
+    , users : List Evergreen.V19.User.User
+    , currentUser : Maybe Evergreen.V19.User.User
     , inputUsername : String
     , inputPassword : String
     , windowWidth : Int
@@ -46,7 +46,7 @@ type alias FrontendModel =
     , popupStatus : PopupStatus
     , showEditor : Bool
     , currentDocument : Evergreen.V19.Document.Document
-    , documents : (List Evergreen.V19.Document.Document)
+    , documents : List Evergreen.V19.Document.Document
     , inputSearchKey : String
     , printingState : PrintingState
     , documentDeleteState : DocumentDeleteState
@@ -59,10 +59,10 @@ type alias BackendModel =
     , currentTime : Time.Posix
     , randomSeed : Random.Seed
     , uuidCount : Int
-    , randomAtmosphericInt : (Maybe Int)
+    , randomAtmosphericInt : Maybe Int
     , dataDict : Evergreen.V19.Data.DataDict
     , authenticationDict : Evergreen.V19.Authentication.AuthenticationDict
-    , documents : (List Evergreen.V19.Document.Document)
+    , documents : List Evergreen.V19.Document.Document
     }
 
 
@@ -76,7 +76,7 @@ type FrontendMsg
     | NoOpFrontendMsg
     | GotNewWindowDimensions Int Int
     | GotViewport Browser.Dom.Viewport
-    | SetViewPortForElement (Result Browser.Dom.Error (Browser.Dom.Element, Browser.Dom.Viewport))
+    | SetViewPortForElement (Result Browser.Dom.Error ( Browser.Dom.Element, Browser.Dom.Viewport ))
     | ChangePopupStatus PopupStatus
     | ToggleEditor
     | SignIn
