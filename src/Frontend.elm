@@ -103,7 +103,7 @@ getStartupDocument url =
             url.path |> String.dropLeft 1
     in
     --GetDocumentByIdForGuest id
-    GetDocumentByIdForGuest "g/rl234-lw140"
+    GetDocumentByIdForGuest "/g/rl234-lw140"
 
 
 
