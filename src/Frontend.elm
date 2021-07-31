@@ -25,7 +25,7 @@ import User
 import Util
 import View.Main
 import View.Utility
-
+import L1.Render.LaTeX
 
 type alias Model =
     FrontendModel
@@ -267,10 +267,21 @@ update msg model =
             in
             ( model, Download.string fileName "text/markdown" markdownText )
 
+
+
+        ExportToLaTeX ->
+            let
+                laTeXText =
+                    L1.Render.LaTeX.transformDocument model.currentDocument.content
+
+                fileName =
+                    model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".tex")
+            in
+            ( model, Download.string fileName "application/x-latex" laTeXText )
         Export ->
             let
                 fileName =
-                    model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".caya")
+                    model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".l1")
             in
             ( model, Download.string fileName "text/plain" model.currentDocument.content )
 

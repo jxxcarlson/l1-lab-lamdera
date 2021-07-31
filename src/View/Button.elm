@@ -3,6 +3,7 @@ module View.Button exposing
     , deleteDocument
     , export
     , exportToMarkown
+    , exportToLaTeX
     , fetchDocuments
     , getDocument
     , getUsers
@@ -123,6 +124,11 @@ deleteDocument model =
 exportToMarkown : Element FrontendMsg
 exportToMarkown =
     buttonTemplate [] ExportToMarkdown "Export to Markdown"
+
+exportToLaTeX : Element FrontendMsg
+exportToLaTeX =
+    buttonTemplate [] ExportToLaTeX "Export to LaTeX"
+
 
 
 export : Element FrontendMsg

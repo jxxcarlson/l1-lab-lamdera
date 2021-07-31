@@ -60,6 +60,7 @@ footer model =
 
         --, Button.export
         , Button.exportToMarkown
+        , Button.exportToLaTeX
 
         --, Button.printToPDF model
         , E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]

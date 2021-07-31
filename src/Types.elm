@@ -100,6 +100,7 @@ type FrontendMsg
     | AskFoDocumentBySlug String
     | FetchDocuments SearchTerm
     | ExportToMarkdown
+    | ExportToLaTeX
     | Export
     | PrintToPDF
     | GotPdfLink (Result Http.Error String)
