@@ -13,6 +13,7 @@ import Frontend.Update
 import Html exposing (Html)
 import L1.API
 import L1.Parser.AST
+import L1.Render.LaTeX
 import L1.Render.Markdown
 import Lamdera exposing (sendToBackend)
 import List.Extra
@@ -25,7 +26,7 @@ import User
 import Util
 import View.Main
 import View.Utility
-import L1.Render.LaTeX
+
 
 type alias Model =
     FrontendModel
@@ -101,7 +102,8 @@ getStartupDocument url =
         id =
             url.path |> String.dropLeft 1
     in
-    GetDocumentByIdForGuest id
+    --GetDocumentByIdForGuest id
+    GetDocumentByIdForGuest "rl234-lw140"
 
 
 
@@ -267,8 +269,6 @@ update msg model =
             in
             ( model, Download.string fileName "text/markdown" markdownText )
 
-
-
         ExportToLaTeX ->
             let
                 laTeXText =
@@ -278,6 +278,7 @@ update msg model =
                     model.currentDocument.title |> String.replace " " "-" |> String.toLower |> (\name -> name ++ ".tex")
             in
             ( model, Download.string fileName "application/x-latex" laTeXText )
+
         Export ->
             let
                 fileName =
