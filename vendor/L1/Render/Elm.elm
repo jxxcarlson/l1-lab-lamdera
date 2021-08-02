@@ -461,7 +461,7 @@ item renderArgs name body _ =
                 _ ->
                     row [ spacing 8, E.width E.fill ]
                         [ column [ E.width (px 100), Font.color (E.rgb255 0 0 200), paddingEach { left = 8, right = 0, top = 0, bottom = 0 } ] [ render renderArgs prefix ]
-                        , column [ E.moveUp 15, paddingEach { left = 18, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
+                        , column [ E.moveUp 18, paddingEach { left = 18, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
                             [ paragraph [] (renderList renderArgs rest) ]
                         ]
 
