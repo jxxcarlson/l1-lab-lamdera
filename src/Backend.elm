@@ -182,7 +182,15 @@ updateFromFrontend sessionId clientId msg model =
                         ]
                     )
 
-        GetDocumentBySlugForGuest path ->
+        GetDocumentBySlugForGuest path_ ->
+            let
+                path =
+                    if path_ == "" then
+                        "/g/jxxcarlson-welcome-to-l1-2021-07-29"
+
+                    else
+                        path_
+            in
             if String.left 3 path /= "/g/" then
                 ( model, sendToFrontend clientId (SendMessage <| "Bad url for guest access: " ++ path) )
 
