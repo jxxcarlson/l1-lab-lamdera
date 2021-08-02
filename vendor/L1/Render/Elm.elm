@@ -446,11 +446,24 @@ item renderArgs name body _ =
             E.none
 
         Just ( prefix, rest ) ->
-            row [ spacing 8, E.width E.fill ]
-                [ column [ E.width (px 100), Font.color (E.rgb255 0 0 200) ] [ render renderArgs prefix ]
-                , column [ E.moveUp 15, paddingEach { left = 24, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
-                    [ paragraph [] (renderList renderArgs rest) ]
-                ]
+            case String.trim (AST.getText prefix) of
+                "::" ->
+                    column [ paddingEach { left = 25, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
+                        [ paragraph [] (renderList renderArgs rest) ]
+
+                ":" ->
+                    row [ spacing 8, E.width E.fill ]
+                        [ column [ E.width (px 100), Font.size 18, Font.color (E.rgb255 0 0 200), paddingEach { left = 8, right = 0, top = 0, bottom = 0 } ] [ text "•" ]
+                        , column [ E.moveUp 19, paddingEach { left = 18, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
+                            [ paragraph [] (renderList renderArgs rest) ]
+                        ]
+
+                _ ->
+                    row [ spacing 8, E.width E.fill ]
+                        [ column [ E.width (px 100), Font.color (E.rgb255 0 0 200), paddingEach { left = 8, right = 0, top = 0, bottom = 0 } ] [ render renderArgs prefix ]
+                        , column [ E.moveUp 15, paddingEach { left = 18, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
+                            [ paragraph [] (renderList renderArgs rest) ]
+                        ]
 
 
 image : FRender msg
