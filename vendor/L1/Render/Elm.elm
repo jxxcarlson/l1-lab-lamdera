@@ -435,10 +435,22 @@ headerPadding level =
     E.paddingEach { top = round (12 / getFactor level), bottom = 0, left = 0, right = 0 }
 
 
+getPrefix element =
+    element |> AST.getArgs |> List.head |> Maybe.map String.words |> Maybe.andThen List.head |> Maybe.withDefault ""
+
+
 item : FRender msg
 item renderArgs name body _ =
-    column [ paddingEach { left = 24, right = 0, top = 0, bottom = 0 } ]
-        [ paragraph [] (renderList renderArgs body) ]
+    case AST.uncons_ body of
+        Nothing ->
+            E.none
+
+        Just ( prefix, rest ) ->
+            row [ spacing 8, E.width E.fill ]
+                [ column [ E.width (px 100), Font.color (E.rgb255 0 0 200) ] [ render renderArgs prefix ]
+                , column [ E.moveUp 15, paddingEach { left = 24, right = 0, top = 0, bottom = 0 }, E.width E.fill ]
+                    [ paragraph [] (renderList renderArgs rest) ]
+                ]
 
 
 image : FRender msg
