@@ -333,7 +333,7 @@ updateFromBackend msg model =
             ( { model | currentUser = Just user, inputSearchKey = ":me" }, Cmd.none )
 
         LoginGuest ->
-            ( { model | currentUser = Just User.guest }, Cmd.none )
+            ( { model | currentUser = Just User.guest, inputSearchKey = ":public" }, Cmd.none )
 
         -- DOCUMENT
         SendDocument doc ->
