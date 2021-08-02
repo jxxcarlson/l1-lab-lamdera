@@ -182,14 +182,14 @@ updateFromFrontend sessionId clientId msg model =
                         ]
                     )
 
-        GetDocumentByIdForGuest fragment ->
-            if String.left 2 fragment /= "g/" then
-                ( model, sendToFrontend clientId (SendMessage <| "Bad url for guest access: " ++ fragment) )
+        GetDocumentBySlugForGuest path ->
+            if String.left 3 path /= "/g/" then
+                ( model, sendToFrontend clientId (SendMessage <| "Bad url for guest access: " ++ path) )
 
             else
                 let
                     slug =
-                        String.dropLeft 2 fragment
+                        String.dropLeft 3 path
                 in
                 case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
                     Nothing ->

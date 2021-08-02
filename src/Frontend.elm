@@ -78,7 +78,7 @@ init url key =
       , printingState = PrintWaiting
       , documentDeleteState = WaitingForDeleteAction
       }
-    , Cmd.batch [ Frontend.Cmd.setupWindow, sendToBackend (getStartupDocument url) ]
+    , Cmd.batch [ Frontend.Cmd.setupWindow, sendToBackend (GetDocumentBySlugForGuest url.path) ]
     )
 
 
@@ -94,20 +94,6 @@ initialSearchKey url =
 urlIsForGuest : Url -> Bool
 urlIsForGuest url =
     String.left 2 url.path == "/g"
-
-
-getStartupDocument : Url -> ToBackend
-getStartupDocument url =
-    let
-        id =
-            url.path |> String.dropLeft 1
-    in
-    --GetDocumentByIdForGuest id
-    GetDocumentByIdForGuest "/g/rl234-lw140"
-
-
-
--- , sendToBackend (GetDocumentById "aboutCYT")
 
 
 update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
@@ -132,6 +118,10 @@ update msg model =
                     ( model, cmd )
 
                 External url ->
+                    let
+                        _ =
+                            Debug.log "UU (2)" url
+                    in
                     ( model
                     , Nav.load url
                     )

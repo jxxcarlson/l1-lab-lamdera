@@ -139,7 +139,7 @@ type ToBackend
     | GetDocumentsWithQuery (Maybe User) SearchTerm
     | GetDocumentById String
     | GetDocumentBySlug String
-    | GetDocumentByIdForGuest String
+    | GetDocumentBySlugForGuest String
     | RegisterNewDocument Document
 
 
