@@ -428,7 +428,7 @@ getTitle str =
                 String.dropLeft 2 line
 
             else if String.startsWith "[title" line then
-                String.dropLeft 6 line
+                String.dropLeft 6 line |> String.dropRight 1 |> String.trim
 
             else
                 "Untitled"
