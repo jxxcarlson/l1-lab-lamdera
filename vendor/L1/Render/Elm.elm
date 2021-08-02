@@ -220,7 +220,7 @@ quote renderArgs _ body _ =
 
 toc : FRender msg
 toc renderArgs _ body _ =
-    column [ E.paddingXY 18 18, spacing 8, Background.color (E.rgb255 234 228 247) ] (el [ Font.bold ] (text <| "Table of contents") :: List.map tocItem (List.drop 1 body))
+    column [ E.paddingXY 18 18, spacing 8, Background.color (E.rgb255 234 228 247) ] (el [ Font.bold ] (text <| "Table of contents") :: List.map tocItem body)
 
 
 tocItem : Element -> E.Element msg
@@ -228,7 +228,7 @@ tocItem e =
     case AST.getTextList2 e of
         n :: content :: rest ->
             el [ paddingEach { left = tocPadding n, right = 0, top = 0, bottom = 0 }, Font.color (E.rgb255 46 33 194) ]
-                (E.link [] { url = internalLink content, label = text content })
+                (E.link [] { url = internalLink content, label = text (AST.getLabel e ++ ". " ++ content) })
 
         _ ->
             E.none
@@ -241,7 +241,7 @@ internalLink str =
 
 tocPadding : String -> Int
 tocPadding str =
-    str |> String.toInt |> Maybe.withDefault 4 |> (\x -> (x - 2) * 12)
+    str |> String.toInt |> Maybe.withDefault 4 |> (\x -> (x - 1) * 12)
 
 
 indent : FRender msg
