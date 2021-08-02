@@ -375,8 +375,15 @@ title renderArgs name body meta =
 
 heading1 : FRender msg
 heading1 renderArgs name body meta =
-    column [ Font.size (headerFontSize 2), headerPadding 1, htmlAttribute "id" "title" ]
-        [ paragraph [] (text (MetaData.getLabel meta ++ ". ") :: renderList renderArgs body) ]
+    column [ Font.size (headerFontSize 2), headerPadding 1, makeId body ]
+        --[ paragraph [] (text (MetaData.getLabel meta ++ ". ") :: renderList renderArgs body) ]
+        [ E.link []
+            { url = "#title"
+            , label =
+                column []
+                    [ paragraph [] (text (MetaData.getLabel meta ++ ". ") :: renderList renderArgs body) ]
+            }
+        ]
 
 
 heading2 : FRender msg
