@@ -185,7 +185,7 @@ updateFromFrontend sessionId clientId msg model =
         GetDocumentBySlugForGuest path_ ->
             let
                 path =
-                    if path_ == "/" then
+                    if path_ == "/guest" then
                         "/g/jxxcarlson-welcome-to-l1-2021-07-29"
 
                     else

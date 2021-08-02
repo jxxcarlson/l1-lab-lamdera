@@ -64,7 +64,7 @@ footer model =
 
         --, Button.printToPDF model
         , E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]
-            (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG"))
+            (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG" |> (\x -> "/g/" ++ x)))
         , messageRow model
         ]
 
