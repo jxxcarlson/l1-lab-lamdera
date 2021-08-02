@@ -118,10 +118,6 @@ update msg model =
                     ( model, cmd )
 
                 External url ->
-                    let
-                        _ =
-                            Debug.log "UU (2)" url
-                    in
                     ( model
                     , Nav.load url
                     )
