@@ -14,7 +14,8 @@ import L1.Library.ParserTools as T
 import L1.Library.StringParser as XString
 import L1.Parser.AST as AST exposing (Element(..), Name(..), VerbatimType(..))
 import L1.Parser.Error exposing (Context(..), Problem(..))
-import L1.Parser.Loc as Loc exposing (Position)
+import L1.Parser.Loc as Loc exposing (StringPosition)
+import L1.Parser.MetaData as MetaData exposing (MetaData)
 import List
 import Parser.Advanced as Parser exposing ((|.), (|=))
 
@@ -35,9 +36,9 @@ type alias ParseError =
 -- PARSER
 
 
-parse : Int -> String -> Element
-parse generation str =
-    case Parser.run (parser generation) str of
+parse : Int -> Loc.ChunkLocation -> Int -> String -> Element
+parse generation chunkLocation scanPosition str =
+    case Parser.run (parser generation chunkLocation scanPosition) str of
         Ok ast ->
             ast
 
@@ -46,32 +47,38 @@ parse generation str =
 
 
 parseSimple =
-    parse 0 >> AST.simplify
+    parse 0 { chunkIndex = 0, firstLine = 0 } 0 >> AST.simplify
 
 
-parseItem : Int -> String -> Result (List ParseError) Element
-parseItem generation str =
-    Parser.run (itemParser generation) str
+parseItem : Int -> Loc.ChunkLocation -> Int -> String -> Result (List ParseError) Element
+parseItem generation chunkLocation scanPosition str =
+    Parser.run (itemParser generation chunkLocation scanPosition) str
 
 
-parseHeading : Int -> String -> Result (List ParseError) Element
-parseHeading generation str =
-    Parser.run (headingParser generation) str
+parseHeading : Int -> Loc.ChunkLocation -> Int -> String -> Result (List ParseError) Element
+parseHeading generation chunkLocation scanPosition str =
+    Parser.run (headingParser generation chunkLocation scanPosition) str
 
 
-parseList : Int -> Int -> String -> Result (List ParseError) (List Element)
-parseList generation lineNumber str =
-    Parser.run (listParser generation lineNumber) str
+parseList : Int -> Loc.ChunkLocation -> Int -> String -> Result (List ParseError) (List Element)
+parseList generation chunkLocation lineNumber str =
+    Parser.run (listParser generation chunkLocation lineNumber) str
 
 
-listParser : Int -> Int -> Parser (List Element)
-listParser generation lineNumber =
-    T.many (parser generation)
+listParser : Int -> Loc.ChunkLocation -> Int -> Parser (List Element)
+listParser generation chunkLocation scanPosition =
+    T.many (parser generation chunkLocation scanPosition)
 
 
-parser : Int -> Parser Element
-parser generation =
-    Parser.oneOf [ primitiveElement generation, mathElement generation, quotedElement generation, codeElement generation, plainText generation ]
+parser : Int -> Loc.ChunkLocation -> Int -> Parser Element
+parser generation chunkLocation scanPosition =
+    Parser.oneOf
+        [ primitiveElement generation chunkLocation scanPosition
+        , mathElement generation chunkLocation scanPosition
+        , quotedElement generation chunkLocation scanPosition
+        , codeElement generation chunkLocation scanPosition
+        , plainText generation chunkLocation scanPosition
+        ]
 
 
 {-|
@@ -83,25 +90,26 @@ parser generation =
 > Ok (Element "strong" [] "stuff" (Just { blockOffset = 0, content = "[strong stuff]", generation = 0, length = 14, offset = 0 }))
 
 -}
-primitiveElement : Int -> Parser Element
-primitiveElement generation =
+primitiveElement : Int -> Loc.ChunkLocation -> Int -> Parser Element
+primitiveElement generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start name body_ end source -> Element name body_ (meta generation start end))
+        Parser.succeed (\start name body_ end source -> Element name body_ (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. leftBracket
             |= Parser.oneOf [ elementName |> Parser.map Name, Parser.succeed UndefinedName ]
-            |= argsAndBody generation
+            |= argsAndBody generation chunkLocation scanPosition
             |. Parser.spaces
             |. rightBracket
             |= Parser.getOffset
             |= Parser.getSource
 
 
-mathElement generation =
+mathElement : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+mathElement generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start content end source -> Verbatim Math content (meta generation start end))
+        Parser.succeed (\start content end source -> Verbatim Math content (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. dollarSign
             |= string [ '$' ]
@@ -110,10 +118,11 @@ mathElement generation =
             |= Parser.getSource
 
 
-codeElement generation =
+codeElement : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+codeElement generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start content end source -> Verbatim Code content (meta generation start end))
+        Parser.succeed (\start content end source -> Verbatim Code content (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. backTick
             |= string [ '`' ]
@@ -122,10 +131,11 @@ codeElement generation =
             |= Parser.getSource
 
 
-quotedElement generation =
+quotedElement : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+quotedElement generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start content end source -> Verbatim Quoted content (meta generation start end))
+        Parser.succeed (\start content end source -> Verbatim Quoted content (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. quoteMark
             |= string [ '"' ]
@@ -134,46 +144,49 @@ quotedElement generation =
             |= Parser.getSource
 
 
-headingParser generation =
+headingParser : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+headingParser generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start n elements end source -> Element (Name ("heading" ++ String.fromInt n)) elements (meta generation start end))
+        Parser.succeed (\start n elements end source -> Element (Name ("heading" ++ String.fromInt n)) elements (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |= hashMarks
             |. Parser.chompIf (\c -> c == ' ') ExpectingSpace
             |. Parser.chompWhile (\c -> c == ' ')
-            |= listParser generation 0
+            |= listParser generation chunkLocation 0
             |= Parser.getOffset
             |= Parser.getSource
 
 
-itemParser generation =
+itemParser : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+itemParser generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start elements end source -> Element (Name "item") elements (meta generation start end))
+        Parser.succeed (\start elements end source -> Element (Name "item") elements (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. colonMark
             |. Parser.chompWhile (\c -> c == ' ')
-            |= listParser generation 0
+            |= listParser generation chunkLocation 0
             |= Parser.getOffset
             |= Parser.getSource
 
 
-parseBlock : Int -> String -> Result (List ParseError) Element
-parseBlock generation str =
-    Parser.run (blockParser generation) str
+parseBlock : Int -> Loc.ChunkLocation -> Int -> String -> Result (List ParseError) Element
+parseBlock generation chunkLocation scanPosition str =
+    Parser.run (blockParser generation chunkLocation scanPosition) str
 
 
-blockParser generation =
+blockParser : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem Element
+blockParser generation chunkLocation scanPosition =
     Parser.inContext CElement <|
         -- TODO: is this correct?
-        Parser.succeed (\start name elements end source -> Element (Name name.content) elements (meta generation start end))
+        Parser.succeed (\start name elements end source -> Element (Name name.content) elements (meta generation chunkLocation scanPosition start end))
             |= Parser.getOffset
             |. pipeMark
             --|. Parser.spaces
             |= T.text Char.isAlpha Char.isAlpha
             |. Parser.chompWhile (\c -> c == ' ')
-            |= listParser generation 0
+            |= listParser generation chunkLocation 0
             |= Parser.getOffset
             |= Parser.getSource
 
@@ -200,19 +213,20 @@ identifier =
         |> Parser.map .content
 
 
-argsAndBody : Int -> Parser.Parser Context Problem (List Element)
-argsAndBody generation =
-    Parser.inContext CArgsAndBody <| elementBody generation
+argsAndBody : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem (List Element)
+argsAndBody generation chunkLocation scanPosition =
+    Parser.inContext CArgsAndBody <| elementBody generation chunkLocation scanPosition
 
 
 metaOfList generation list =
     { generation = generation, position = list |> List.map (\el -> AST.position el) |> Loc.positionOfList }
 
 
-elementBody generation =
+elementBody : Int -> Loc.ChunkLocation -> Int -> Parser.Parser Context Problem (List Element)
+elementBody generation chunkLocation scanPosition =
     Parser.inContext CBody <|
         -- Parser.lazy (\_ -> T.many (parser generation) |> Parser.map (\list -> EList list (metaOfList generation list)))
-        Parser.lazy (\_ -> T.many (parser generation))
+        Parser.lazy (\_ -> T.many (parser generation chunkLocation scanPosition))
 
 
 
@@ -238,23 +252,34 @@ hasProblem elements =
 -- TEXT AND STRINGS
 
 
-meta generation start finish =
-    { position = { start = start, end = finish }, generation = generation }
+meta : Int -> Loc.ChunkLocation -> Int -> Int -> Int -> MetaData
+meta generation chunkLocation scanPoint start finish =
+    let
+        stringLocation =
+            -- { start = start + Debug.log "SCAN POINT" scanPoint, end = finish - 1 + scanPoint }
+            { start = start + scanPoint, end = finish - 1 + scanPoint }
+    in
+    { position = stringLocation
+    , generation = generation
+    , location = chunkLocation
+    , id = MetaData.makeId generation chunkLocation stringLocation
+    , info = Nothing
+    }
 
 
-plainText : Int -> Parser Element
-plainText generation =
+plainText : Int -> Loc.ChunkLocation -> Int -> Parser Element
+plainText generation chunkLocation scanPosition =
     Parser.inContext TextExpression <|
         (XString.textWithPredicate XString.isNonLanguageChar
-            |> Parser.map (\data -> Text data.content (meta generation data.start data.finish))
+            |> Parser.map (\data -> Text data.content (meta generation chunkLocation scanPosition data.start data.finish))
         )
 
 
-textWithPredicate : (Char -> Bool) -> Int -> Parser Element
-textWithPredicate predicate generation =
+textWithPredicate : (Char -> Bool) -> Int -> Loc.ChunkLocation -> Int -> Parser Element
+textWithPredicate predicate generation chunkLocation scanPosition =
     Parser.inContext TextExpression <|
         (XString.textWithPredicate predicate
-            |> Parser.map (\data -> Text data.content (meta generation data.start data.finish))
+            |> Parser.map (\data -> Text data.content (meta generation chunkLocation scanPosition data.start data.finish))
         )
 
 

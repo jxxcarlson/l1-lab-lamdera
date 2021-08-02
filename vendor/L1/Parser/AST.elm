@@ -1,12 +1,15 @@
 module L1.Parser.AST exposing
     ( Element(..)
     , Element_(..)
+    , Element__(..)
     , Name(..)
     , VerbatimType(..)
     , argsAndBody
     , body
     , body_
     , getArgs
+    , getName
+    , getNameAndId
     , getText
     , getTextList
     , getTextList2
@@ -18,7 +21,9 @@ module L1.Parser.AST exposing
     , makeTOC
     , map
     , position
+    , setLabel
     , simplify
+    , simplify_
     , stringContent
     , toList
     , toStringList
@@ -45,6 +50,16 @@ type VerbatimType
     | Quoted
 
 
+setLabel : String -> Element -> Element
+setLabel str el =
+    case el of
+        Element (Name name) bod meta ->
+            Element (Name name) bod { meta | info = Just { label = str } }
+
+        _ ->
+            el
+
+
 toStringList : Element -> List String
 toStringList element =
     case element of
@@ -59,6 +74,16 @@ toStringList element =
 
         Problem _ _ ->
             [ "problems" ]
+
+
+getNameAndId : Element -> Maybe { name : String, id : String }
+getNameAndId el =
+    case el of
+        Element (Name name) _ { id } ->
+            Just { name = name, id = id }
+
+        _ ->
+            Nothing
 
 
 stringContent : List Element -> String
@@ -150,10 +175,17 @@ type Name
 {-| A simplified version of the AST for humans
 -}
 type Element_
-    = Text_ String
-    | Element_ Name (List Element_)
-    | Verbatim_ VerbatimType String
+    = Text_ String String
+    | Element_ Name (List Element_) String
+    | Verbatim_ VerbatimType String String
     | Problem_ Problem String
+
+
+type Element__
+    = Text__ String
+    | Element__ Name (List Element__)
+    | Verbatim__ VerbatimType String
+    | Problem__ Problem String
 
 
 length : Element -> Int
@@ -165,7 +197,7 @@ length element =
     pos.end - pos.start
 
 
-position : Element -> Loc.Position
+position : Element -> Loc.StringPosition
 position element =
     case element of
         Text _ meta ->
@@ -178,23 +210,39 @@ position element =
             meta.position
 
         Problem _ _ ->
-            Loc.dummy
+            Loc.dummyPosition
 
 
 simplify : Element -> Element_
 simplify element =
     case element of
-        Text str _ ->
-            Text_ str
+        Text str meta ->
+            Text_ str meta.id
 
-        Element name body__ _ ->
-            Element_ name (List.map simplify body__)
+        Element name body__ meta ->
+            Element_ name (List.map simplify body__) meta.id
 
-        Verbatim name content _ ->
-            Verbatim_ name content
+        Verbatim name content meta ->
+            Verbatim_ name content meta.id
 
         Problem p s ->
             Problem_ (List.head p |> Maybe.map .problem |> Maybe.withDefault NoError) s
+
+
+simplify_ : Element -> Element__
+simplify_ element =
+    case element of
+        Text str _ ->
+            Text__ str
+
+        Element name body__ _ ->
+            Element__ name (List.map simplify_ body__)
+
+        Verbatim name content _ ->
+            Verbatim__ name content
+
+        Problem p s ->
+            Problem__ (List.head p |> Maybe.map .problem |> Maybe.withDefault NoError) s
 
 
 
@@ -234,7 +282,7 @@ body element =
 body_ : Element_ -> List Element_
 body_ element =
     case element of
-        Element_ _ list ->
+        Element_ _ list _ ->
             list
 
         _ ->
@@ -378,6 +426,9 @@ getTitle str =
         Just line ->
             if L1.Library.Utility.characterAt 0 line == "#" then
                 String.dropLeft 2 line
+
+            else if String.startsWith "[title" line then
+                String.dropLeft 6 line
 
             else
                 "Untitled"

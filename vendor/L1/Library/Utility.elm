@@ -30,16 +30,12 @@ characterAt k str =
 
 debug str x =
     -- Debug.log (Console.yellow str) x
-    x
+    str ++ x
 
 
 debug2 str x =
     -- Debug.log (Console.cyan str) x
-    x
-
-
-
--- str ++ x
+    str ++ x
 
 
 squeeze : String -> String

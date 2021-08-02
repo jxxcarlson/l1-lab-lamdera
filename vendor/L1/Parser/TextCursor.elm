@@ -1,6 +1,6 @@
 module L1.Parser.TextCursor exposing
     ( TextCursor, init
-    , ProtoStackItem(..), ScannerType(..), advance, commit, pop, push
+    , Accumulator, ProtoStackItem(..), ScannerType(..), advance, advanceHeadingRegister, commit, emptyAccumulator, pop, push
     )
 
 {-| TextCursor is the data structure used by L1.Parser.parseLoop.
@@ -12,9 +12,11 @@ module L1.Parser.TextCursor exposing
 import L1.Library.Console as Console
 import L1.Library.ParserTools as ParserTools
 import L1.Library.Utility as Utility exposing (debug, debug2)
+import L1.Library.Vector as Vector
 import L1.Parser.AST as AST exposing (Element(..), Name(..))
 import L1.Parser.Config as Config exposing (Configuration, EType(..), Expectation)
 import L1.Parser.Configuration as Configuration
+import L1.Parser.Loc as Loc
 import L1.Parser.MetaData as MetaData exposing (MetaData)
 import L1.Parser.Stack as Stack exposing (StackItem(..))
 import List.Extra
@@ -26,11 +28,13 @@ import Parser.Advanced
 type alias TextCursor =
     { count : Int
     , generation : Int
+    , chunkLocation : Loc.ChunkLocation
 
     ---
     , verbatimPrefix : Maybe String
     , scannerType : ScannerType
     , scanPoint : Int
+    , previousScanPoint : Int
     , sourceLength : Int
 
     ---
@@ -40,7 +44,13 @@ type alias TextCursor =
     , stack : List StackItem -- a stack of unclosed elements
 
     ---
+    , accumulator : Accumulator
     , message : String
+    }
+
+
+type alias Accumulator =
+    { headingRegister : Vector.Vector
     }
 
 
@@ -56,13 +66,15 @@ type ProtoStackItem
 
 {-| initialize with source text
 -}
-init : Int -> String -> TextCursor
-init generation source =
+init : Accumulator -> Int -> Loc.ChunkLocation -> String -> TextCursor
+init accumulator generation chunkLocation source =
     { count = 0
     , generation = generation
+    , chunkLocation = chunkLocation
 
     --
     , scanPoint = 0
+    , previousScanPoint = 0
     , sourceLength = String.length source
     , scannerType = NormalScan
     , verbatimPrefix = Nothing
@@ -74,8 +86,18 @@ init generation source =
     , stack = []
 
     --
+    , accumulator = accumulator
     , message = "START"
     }
+
+
+emptyAccumulator =
+    { headingRegister = Vector.init 4 }
+
+
+advanceHeadingRegister : Int -> Accumulator -> Accumulator
+advanceHeadingRegister k acc =
+    { acc | headingRegister = Vector.increment k acc.headingRegister }
 
 
 {-| SHIFT
@@ -204,6 +226,7 @@ push ({ prefix, isMatch } as prefixData) proto tc =
         | count = tc.count + 1
         , verbatimPrefix = verbatimPrefix
         , scannerType = scannerType
+        , previousScanPoint = tc.scanPoint
         , scanPoint = tc.scanPoint + scanPointIncrement
         , stack = newStack
     }
@@ -211,7 +234,7 @@ push ({ prefix, isMatch } as prefixData) proto tc =
 
 {-| REDUCE
 -}
-pop : (String -> Element) -> String -> TextCursor -> TextCursor
+pop : (Int -> Loc.ChunkLocation -> Int -> String -> Element) -> String -> TextCursor -> TextCursor
 pop parse prefix cursor =
     -- The cursors' scanPoint is pointing at a character that
     -- signal the end of an element, e.g., ']' in the
@@ -220,24 +243,31 @@ pop parse prefix cursor =
     -- two case, depending on whether cursor.text is empty.
     case List.head cursor.stack of
         Nothing ->
-            { cursor | count = cursor.count + 1, scanPoint = cursor.scanPoint + 1, scannerType = NormalScan }
+            { cursor | count = cursor.count + 1, previousScanPoint = cursor.scanPoint, scanPoint = cursor.scanPoint + 1, scannerType = NormalScan }
 
         Just stackTop_ ->
             let
                 data =
                     Stack.showStack (List.reverse cursor.stack) ++ prefix
+
+                position =
+                    cursor.stack |> List.reverse |> List.head |> Maybe.map Stack.startPosition |> Maybe.withDefault 0
+
+                newParsed =
+                    parse cursor.generation cursor.chunkLocation position data
             in
             { cursor
                 | stack = []
-                , parsed = parse data :: cursor.parsed
+                , parsed = newParsed :: cursor.parsed
                 , count = cursor.count + 1
+                , previousScanPoint = cursor.scanPoint
                 , scanPoint = cursor.scanPoint + 1
             }
 
 
 {-| REDUCE
 -}
-commit : (String -> Element) -> TextCursor -> TextCursor
+commit : (Int -> Loc.ChunkLocation -> Int -> String -> Element) -> TextCursor -> TextCursor
 commit parse tc =
     if tc.stack == [] && tc.scanPoint >= tc.sourceLength then
         finishUp tc
@@ -255,12 +285,17 @@ finishUp tc =
     { tc | parsed = [] }
 
 
+finishUpWithReducibleStack : (Int -> Loc.ChunkLocation -> Int -> String -> Element) -> TextCursor -> TextCursor
 finishUpWithReducibleStack parse tc =
     let
         stackData =
             tc.stack |> List.reverse |> List.map Stack.show |> String.join ""
+
+        newParsed =
+            -- parse tc.generation tc.chunkLocation (Debug.log "FU, P" tc.previousScanPoint) stackData
+            parse tc.generation tc.chunkLocation tc.previousScanPoint stackData
     in
-    { tc | complete = parse stackData :: tc.complete }
+    { tc | complete = newParsed :: tc.complete }
 
 
 

@@ -1,30 +1,31 @@
-module L1.Parser.Chunk exposing (parse, parseLoop, pl, pl_)
+module L1.Parser.Chunk exposing (parse, parseLoop, pl, pl_, pl__)
 
 import L1.Parser.AST as AST exposing (Element(..))
 import L1.Parser.Error exposing (Context(..), Problem(..))
+import L1.Parser.Loc as Loc
 import L1.Parser.Loop as Loop
 import L1.Parser.Parser as Parser
-import L1.Parser.TextCursor exposing (TextCursor)
+import L1.Parser.TextCursor exposing (Accumulator, TextCursor, emptyAccumulator)
 import Parser.Advanced as PA
 
 
-parseLoop : (String -> Element) -> Int -> String -> TextCursor
-parseLoop parser generation str =
-    Loop.parseLoop parser generation str
+parseLoop : (Int -> Loc.ChunkLocation -> Int -> String -> Element) -> Accumulator -> Int -> Loc.ChunkLocation -> String -> TextCursor
+parseLoop parser accumulator generation chunkLocation str =
+    Loop.parseLoop parser accumulator generation chunkLocation str
 
 
-parse : (String -> Element) -> Int -> String -> List AST.Element
-parse parser generation str =
+parse : (Int -> Loc.ChunkLocation -> Int -> String -> Element) -> Accumulator -> Int -> Loc.ChunkLocation -> String -> List AST.Element
+parse parser accumulator generation chunkLocation str =
     str
-        |> parseLoop parser generation
+        |> parseLoop parser accumulator generation chunkLocation
         |> .complete
 
 
-pl : String -> List AST.Element
-pl str =
+pl : Int -> String -> List AST.Element
+pl scanPoint str =
     let
         tc =
-            parseLoop (Parser.parse 0) 0 str
+            parseLoop Parser.parse emptyAccumulator 3 { chunkIndex = 3, firstLine = 0 } str
     in
     tc |> .complete
 
@@ -35,9 +36,20 @@ pl_ : String -> List AST.Element_
 pl_ str =
     let
         tc =
-            parseLoop (Parser.parse 0) 0 str
+            parseLoop Parser.parse emptyAccumulator 1 { chunkIndex = 0, firstLine = 0 } str
     in
     tc |> .complete |> List.map AST.simplify
+
+
+{-| Used for testing
+-}
+pl__ : String -> List AST.Element__
+pl__ str =
+    let
+        tc =
+            parseLoop Parser.parse emptyAccumulator 3 { chunkIndex = 3, firstLine = 0 } str
+    in
+    tc |> .complete |> List.map AST.simplify_
 
 
 
