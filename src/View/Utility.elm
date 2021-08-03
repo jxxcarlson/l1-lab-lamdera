@@ -2,6 +2,7 @@ module View.Utility exposing
     ( cssNode
     , elementAttribute
     , getElementWithViewPort
+    , hideIf
     , katexCSS
     , noFocus
     , setViewPortForSelectedLine
@@ -30,6 +31,15 @@ showIf isVisible element =
 
     else
         Element.none
+
+
+hideIf : Bool -> Element msg -> Element msg
+hideIf condition element =
+    if condition then
+        Element.none
+
+    else
+        element
 
 
 setViewportForElement : String -> Cmd FrontendMsg

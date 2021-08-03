@@ -114,14 +114,20 @@ signedInHeader model user =
     E.row [ E.spacing 12 ]
         [ Button.signOut user.username
         , Button.fetchDocuments model.inputSearchKey
-        , Button.newDocument
-        , Button.deleteDocument model
-        , Button.toggleAccess model
-        , Button.toggleEditor model
+        , View.Utility.hideIf (userIsGuest model) Button.newDocument
+        , View.Utility.hideIf (userIsGuest model) (Button.deleteDocument model)
+        , View.Utility.hideIf (userIsGuest model) (Button.toggleAccess model)
+        , View.Utility.hideIf (userIsGuest model) (Button.toggleEditor model)
         , author model
         , wordCount model
-        , Button.help
+
+        -- , Button.help
         ]
+
+
+userIsGuest : Model -> Bool
+userIsGuest model =
+    Maybe.map .username model.currentUser == Just "guest"
 
 
 wordCount : Model -> Element FrontendMsg
