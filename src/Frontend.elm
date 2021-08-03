@@ -183,7 +183,7 @@ update msg model =
                 , inputUsername = ""
                 , inputPassword = ""
               }
-            , Cmd.none
+            , Nav.pushUrl model.key "/"
             )
 
         GrantGuestAccess ->
