@@ -31,114 +31,36 @@ notSignedIn =
 
 
 notSigneInText =
-    """# Welcome to L1
+    """[title Welcome to L1]
 
-[blue [i An experimental markup language.  Can change at any time!]]
+       [i L1 is an experiment in the design of markup languages and fault-tolerant parsers. ]
 
-James Carlson (jxxcarlson@gmail.com)
+       [b Guest Access]
 
-## About the App
+       ::: [blue [i Click on the [b [violet Fetch] ]button above to see more documents.]]
 
-As guest, click [b Fetch] to fetch documents.  Guests have access to public documents.  Put [quote :public]
-in the search field to fetch all public documents.  Put [quote atom] to search for documents about atoms.  Etc.
+       ::: As a guest, you can create and edit documents.  However, your documents will not be saved.  You can also edit an existing public document.  Those edits will not be saved either.
 
-[blue [i Create an account to experiment with documents. Just put in a username and password and click [b Sign in].]]
+       [b User Account]
 
-[violet [i To sign out, click the left-most button above: the one with your username.]]
+       ::: To make a user account, first make sure that you are signed out.  If the leftmost button above says [quote guest], click it.  Then you will see a button [b Sign In | Sign Up].  That's the one to click.
 
-
-
-
-## About L1
-
-[b L1] is an experiment in markup language design and the construction of fault-tolerant parsers for them.  L1 documents are a mixture of ordinary text and elements:
-
-|| codeblock
-This is [b bold text.]
-And this is [i talic text.]
-
-The elements are the pieces of the form `[f x y ...]`, where `f` is the [i name] of the element and `x`, `y`, etc. are the elements of its [i body].  You can think of the body as a list whose items are either [quote words] or other elements, e.g., `[i italic [b bold-italic]]`, which is rendered as
-
-| indent
-[i italic [b bold-italic]]
-
-There are a few other bits of grammar.  First, there is in-line code and in-line math:
-
-|| codeblock
-`a[i] = b[i] + 1`
-$a^2 + b^2 = c^2$
-
-for code and math.  These render as `a[i] = b[i] + 1` and $a^2 + b^2 = c^2$.  Second, there are [i blocks], .e.g,
-
-|| codeblock
-|| mathblock
-\\int_0^1 x^n
-  =
-\\frac{1}{n+1}
-
-which is rendered as
-
-|| mathblock
-\\int_0^1 x^n
-  =
-\\frac{1}{n+1}
-
-There are also blocks for code:
+       ::: With a user account, you can create and save documents.  Please note, however, that the  L1 language is currently an experiment and so can change at any time.
 
 
-|| codeblock
-|| codeblock
-import sys
-"""
-        ++ String.fromChar '\u{00A0}'
-        ++ """
-capital = float(sys.argv[1])
-...
+       [b Fech and Filter]
 
-which is rendered as
+       ::: The [b Fetch] button retrieves documents from storage.
 
-|| codeblock
-import sys
-"""
-        ++ String.fromChar '\u{00A0}'
-        ++ """
-capital = float(sys.argv[1])
-rate = float(sys.argv[2])/100.0
-years = int(sys.argv[3])
-"""
-        ++ String.fromChar '\u{00A0}'
-        ++ """
-for i in range(0, years):
-  capital = (1 + rate)*capital
-  print "%3d %8.0f" % (i, capital)
+       ::: If you only want to see some documents, put a keyword in the search box. Thus, if you only want to see documents pertaning to L1, put [quote l1] in the search box. Filtering is not case-sensitive. The special keywords [blue :public] and [blue :me] do what they say.
+
+       :::  Filter the documents already fetched by putting a (different) keyword in the search box.
 
 
-Blocks must have at least one empy line above and below.  [quote blank] lines inside a block are permitted, but they cannot be [i empty]: put at least one space.  For more information about L1, see the articles [i The L1 Markup Language] and [i Fault-tolerant Parsing].
 
-For more information about L1, see [ilink "this document" "/s/jxxcarlson-the-l1-markup-language-2021-07-27"]
+       [b Comments]
 
-
-## Export
-
-At the moment there is an imperfect export-to-markdown feature.
-This feature will always be [quote lossy], since L1 is more expressive than Markdown.
-We plan to have export to LaTeX, and with it export to PDF.
-
-## Using L1
-
-For now, L1 should be used only for experimentation.  It is an experiment itself,
-and so will change as I discover mistakes in its design or discover a better design.
-
-## Design Philosophy
-
-Nonetheless, there is one overriding principle of design:
-[i the language shoud remain very simple, but with features that make it expressive and powerful.]
-Simplicity makes a language easy to learn and to use.  It also makes it easier to develop and maintain.
-
-## The L1 Mascot
-
-[image "width:400" "placement:center" "https://i.pinimg.com/originals/d4/07/a4/d407a45bcf3ade18468ac7ba633244b9.jpg"]
-
+       ::: You can reach me, Jim Carlson, at jxxcarlson@gmail.com or on the Elm Slack as jxxcarlson.
 
 """
 

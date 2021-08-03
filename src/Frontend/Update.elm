@@ -46,7 +46,7 @@ newDocument model =
                             | title = "New Document"
                             , author = user.realname
                             , username = user.username
-                            , content = "# New Document"
+                            , content = "[title New Document]"
                         }
                 in
                 ( { model | showEditor = True }, sendToBackend (RegisterNewDocument doc) )
