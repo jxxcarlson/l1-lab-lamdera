@@ -63,8 +63,8 @@ footer model =
         , Button.exportToLaTeX
 
         --, Button.printToPDF model
-        , E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]
-            (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG" |> (\x -> "https://l1-lab.lamdera.app/g/" ++ x)))
+        --, E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]
+        --    (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG" |> (\x -> "https://l1-lab.lamdera.app/g/" ++ x)))
         , messageRow model
         ]
 
@@ -77,12 +77,30 @@ messageRow model =
         , View.Style.bgGray 0.1
         , View.Style.fgGray 1.0
         ]
-        [ E.text model.message, viewId model ]
+        [ E.text model.message, viewSlug model ]
 
 
-viewId model =
+viewSlug model =
     E.el [ E.alignRight, E.moveUp 3, Font.color (E.rgb 0.7 0.7 0.7) ]
-        (E.text model.currentDocument.id)
+        (E.text (niceSlug model.currentDocument))
+
+
+niceSlug : Document -> String
+niceSlug doc =
+    case doc.access of
+        Public ->
+            case doc.slug of
+                Nothing ->
+                    "no slug"
+
+                Just slug ->
+                    "https://l1-lab.lamdera.app/g/" ++ slug
+
+        Private ->
+            "(private)"
+
+        Shared _ ->
+            "(shared)"
 
 
 header model =
