@@ -41,6 +41,8 @@ notSigneInText =
 
 ::: As a guest, you can create and edit documents.  However, your documents will not be saved.  You can also edit an existing public document.  Those edits will not be saved either.
 
+::: Here is a document to get started with: [ilink "A Sample Document" /s/jxxcarlson-a-sample-document-2021-08-03]
+
 [b User Account]
 
 ::: To make a user account, first make sure that you are signed out.  If the leftmost button above says [quote guest], click it.  Then you will see a button [b Sign In | Sign Up].  That's the one to click.
@@ -61,6 +63,7 @@ notSigneInText =
 [b Comments]
 
 ::: You can reach me, Jim Carlson, at jxxcarlson@gmail.com or on the Elm Slack as jxxcarlson.
+
 
 """
 
