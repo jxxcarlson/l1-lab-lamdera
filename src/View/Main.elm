@@ -114,10 +114,10 @@ signedInHeader model user =
     E.row [ E.spacing 12 ]
         [ Button.signOut user.username
         , Button.fetchDocuments model.inputSearchKey
-        , View.Utility.hideIf (userIsGuest model) Button.newDocument
+        , Button.newDocument
         , View.Utility.hideIf (userIsGuest model) (Button.deleteDocument model)
         , View.Utility.hideIf (userIsGuest model) (Button.toggleAccess model)
-        , View.Utility.hideIf (userIsGuest model) (Button.toggleEditor model)
+        , Button.toggleEditor model
         , author model
         , wordCount model
 
