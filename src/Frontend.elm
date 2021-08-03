@@ -335,7 +335,8 @@ updateFromBackend msg model =
 
         LoginGuest ->
             ( { model | currentUser = Just User.guest, inputSearchKey = ":public" }
-            , sendToBackend (GetDocumentBySlugForGuest "/g/jxxcarlson-welcome-to-l1-2021-07-29")
+            , Cmd.none
+              -- sendToBackend (GetDocumentBySlugForGuest "/g/jxxcarlson-welcome-to-l1-2021-07-29")
             )
 
         -- DOCUMENT
