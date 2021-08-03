@@ -33,34 +33,34 @@ notSignedIn =
 notSigneInText =
     """[title Welcome to L1]
 
-       [i L1 is an experiment in the design of markup languages and fault-tolerant parsers. ]
+[i L1 is an experiment in the design of markup languages and fault-tolerant parsers. ]
 
-       [b Guest Access]
+[b Guest Access]
 
-       ::: [blue [i Click on the [b [violet Fetch] ]button above to see more documents.]]
+::: [blue [i Click on the [b [violet Fetch] ]button above to see more documents.]]
 
-       ::: As a guest, you can create and edit documents.  However, your documents will not be saved.  You can also edit an existing public document.  Those edits will not be saved either.
+::: As a guest, you can create and edit documents.  However, your documents will not be saved.  You can also edit an existing public document.  Those edits will not be saved either.
 
-       [b User Account]
+[b User Account]
 
-       ::: To make a user account, first make sure that you are signed out.  If the leftmost button above says [quote guest], click it.  Then you will see a button [b Sign In | Sign Up].  That's the one to click.
+::: To make a user account, first make sure that you are signed out.  If the leftmost button above says [quote guest], click it.  Then you will see a button [b Sign In | Sign Up].  That's the one to click.
 
-       ::: With a user account, you can create and save documents.  Please note, however, that the  L1 language is currently an experiment and so can change at any time.
-
-
-       [b Fech and Filter]
-
-       ::: The [b Fetch] button retrieves documents from storage.
-
-       ::: If you only want to see some documents, put a keyword in the search box. Thus, if you only want to see documents pertaning to L1, put [quote l1] in the search box. Filtering is not case-sensitive. The special keywords [blue :public] and [blue :me] do what they say.
-
-       :::  Filter the documents already fetched by putting a (different) keyword in the search box.
+::: With a user account, you can create and save documents.  Please note, however, that the  L1 language is currently an experiment and so can change at any time.
 
 
+[b Fech and Filter]
 
-       [b Comments]
+::: The [b Fetch] button retrieves documents from storage.
 
-       ::: You can reach me, Jim Carlson, at jxxcarlson@gmail.com or on the Elm Slack as jxxcarlson.
+::: If you only want to see some documents, put a keyword in the search box. Thus, if you only want to see documents pertaning to L1, put [quote l1] in the search box. Filtering is not case-sensitive. The special keywords [blue :public] and [blue :me] do what they say.
+
+:::  Filter the documents already fetched by putting a (different) keyword in the search box.
+
+
+
+[b Comments]
+
+::: You can reach me, Jim Carlson, at jxxcarlson@gmail.com or on the Elm Slack as jxxcarlson.
 
 """
 
