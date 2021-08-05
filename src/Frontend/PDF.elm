@@ -23,16 +23,19 @@ print model =
 generatePdf : Document -> Cmd FrontendMsg
 generatePdf document =
     let
-        contentForExport =
-            document.content
-                |> L1.Render.LaTeX.transformDocument
-
-        imageUrls =
+        ast =
             document.content
                 |> L1.Parser.Document.parse 0
                 |> List.concat
+
+        imageUrls =
+            ast
                 |> AST.filterOnName "image"
                 |> List.map (AST.getText >> String.trim)
+
+        contentForExport =
+            document.content
+                |> L1.Render.LaTeX.transformDocument
     in
     Http.request
         { method = "POST"

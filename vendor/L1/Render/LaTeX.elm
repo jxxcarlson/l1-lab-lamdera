@@ -56,7 +56,7 @@ renderElementDict =
         , ( "link", link )
         , ( "image", image )
         , ( "toc", toc )
-        , ( "title", macro0 "title" )
+        , ( "title", empty )
 
         -- , ( "heading", heading )
         , ( "item", item )
@@ -70,17 +70,30 @@ renderElementDict =
 
 transformDocument : String -> String
 transformDocument doc =
+    let
+        ast =
+            doc
+                |> L1.Parser.Document.parse 0
+                |> List.concat
+
+        title =
+            ast
+                |> AST.filterOnName "title"
+                |> List.map (AST.getText >> String.trim)
+                |> List.head
+                |> Maybe.withDefault "Untitled"
+    in
     doc
         |> L1.Parser.Document.parse 0
         |> List.map (transformList { width = 600 })
         |> String.join "\n\n"
-        |> (\data -> preamble ++ data ++ "\n\\end{document}")
+        |> (\data -> preamble title ++ data ++ "\n\\end{document}")
 
 
 {-| A standard preamble
 -}
-preamble : String
-preamble =
+preamble : String -> String
+preamble title =
     """
 \\documentclass[11pt, oneside]{article}
 
@@ -177,6 +190,10 @@ preamble =
 
 \\begin{document}
 
+
+\\title{""" ++ title ++ """}
+
+\\maketitle
 
 """
 
@@ -355,6 +372,11 @@ heading4 =
 toc : FRender
 toc _ _ _ =
     "\\tableofcontents"
+
+
+empty : FRender
+empty _ _ _ =
+    ""
 
 
 image : FRender
