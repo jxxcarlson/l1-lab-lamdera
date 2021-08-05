@@ -191,28 +191,54 @@ updateFromFrontend sessionId clientId msg model =
                     else
                         path_
             in
-            if String.left 3 path /= "/g/" then
-                ( model, sendToFrontend clientId (SendMessage <| "Bad url for guest access: " ++ path) )
+            if String.left 3 path == "/g" then
+                signInAsGuestWithDoc model clientId path
+
+            else if String.left 3 path == "/s/" then
+                sendDoc model clientId path
 
             else
-                let
-                    slug =
-                        String.dropLeft 3 path
-                in
-                case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
-                    Nothing ->
-                        ( model
-                        , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2): " ++ slug)
-                        )
+                sendDoc model clientId "https://l1-lab.lamdera.app/s/jxxcarlson-welcome-to-l1-2021-07-29"
 
-                    Just doc ->
-                        ( model
-                        , Cmd.batch
-                            [ sendToFrontend clientId (SendDocument doc)
-                            , sendToFrontend clientId (SendMessage "Signed in as guest")
-                            , sendToFrontend clientId LoginGuest
-                            ]
-                        )
+
+sendDoc model clientId path =
+    let
+        slug =
+            String.dropLeft 3 path
+    in
+    case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
+        Nothing ->
+            ( model
+            , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2b): " ++ slug)
+            )
+
+        Just doc ->
+            ( model
+            , Cmd.batch
+                [ sendToFrontend clientId (SendDocument doc)
+                ]
+            )
+
+
+signInAsGuestWithDoc model clientId path =
+    let
+        slug =
+            String.dropLeft 3 path
+    in
+    case List.head (List.filter (\doc -> doc.slug == Just slug) model.documents) of
+        Nothing ->
+            ( model
+            , sendToFrontend clientId (SendMessage <| "Could not find document by slug (2): " ++ slug)
+            )
+
+        Just doc ->
+            ( model
+            , Cmd.batch
+                [ sendToFrontend clientId (SendDocument doc)
+                , sendToFrontend clientId (SendMessage "Signed in as guest")
+                , sendToFrontend clientId LoginGuest
+                ]
+            )
 
 
 idMessage model =
