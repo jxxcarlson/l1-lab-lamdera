@@ -50,7 +50,7 @@ notSigneInText =
 ::: With a user account, you can create and save documents.  Please note, however, that the  L1 language is currently an experiment and so can change at any time.
 
 
-[b Fech and Filter]
+[b Fetch and Filter]
 
 ::: The [b Fetch] button retrieves documents from storage.
 

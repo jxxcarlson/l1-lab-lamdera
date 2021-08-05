@@ -424,15 +424,19 @@ heading4 renderArgs name body meta =
 
 getFactor : Int -> Float
 getFactor level =
-    min 1.8 (sqrt (sqrt (toFloat level)))
+    if level < 1 then
+        1
+
+    else
+        max 0.5 (1 / (toFloat level ^ 0.4))
 
 
 headerFontSize level =
-    round (32 / getFactor level)
+    round (32 * getFactor level)
 
 
 headerPadding level =
-    E.paddingEach { top = round (12 / getFactor level), bottom = 0, left = 0, right = 0 }
+    E.paddingEach { top = round (12 * getFactor level), bottom = 0, left = 0, right = 0 }
 
 
 getPrefix element =
