@@ -61,8 +61,8 @@ footer model =
         --, Button.export
         , Button.exportToMarkown
         , Button.exportToLaTeX
+        , Button.printToPDF model
 
-        --, Button.printToPDF model
         --, E.el [ Font.size 12, Font.color Color.white, E.paddingXY 10 0 ]
         --    (E.text (model.currentDocument |> .slug |> Maybe.withDefault "SLUG" |> (\x -> "https://l1-lab.lamdera.app/g/" ++ x)))
         , messageRow model

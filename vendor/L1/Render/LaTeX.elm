@@ -55,6 +55,8 @@ renderElementDict =
         , ( "mb", mathblock )
         , ( "link", link )
         , ( "image", image )
+        , ( "toc", toc )
+        , ( "title", macro0 "title" )
 
         -- , ( "heading", heading )
         , ( "item", item )
@@ -348,6 +350,11 @@ heading3 =
 heading4 : FRender
 heading4 =
     macro0 "subheading"
+
+
+toc : FRender
+toc _ _ _ =
+    "\\tableofcontents"
 
 
 image : FRender

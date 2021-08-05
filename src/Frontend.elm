@@ -9,6 +9,7 @@ import Data
 import Document exposing (Access(..))
 import File.Download as Download
 import Frontend.Cmd
+import Frontend.PDF as PDF
 import Frontend.Update
 import Html exposing (Html)
 import L1.API
@@ -274,10 +275,10 @@ update msg model =
             ( model, Download.string fileName "text/plain" model.currentDocument.content )
 
         PrintToPDF ->
-            ( model, Cmd.none )
+            PDF.print model
 
         GotPdfLink result ->
-            ( model, Cmd.none )
+            PDF.gotLink model result
 
         ChangePrintingState printingState ->
             let
