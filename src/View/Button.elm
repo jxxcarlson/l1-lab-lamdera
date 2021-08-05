@@ -2,8 +2,8 @@ module View.Button exposing
     ( adminPopup
     , deleteDocument
     , export
-    , exportToMarkown
     , exportToLaTeX
+    , exportToMarkown
     , fetchDocuments
     , getDocument
     , getUsers
@@ -84,7 +84,7 @@ toggleEditor model =
 
 
 signOut username =
-    buttonTemplate [] SignOut username
+    buttonTemplate [] SignOut ("Sign out " ++ username)
 
 
 
@@ -125,10 +125,10 @@ exportToMarkown : Element FrontendMsg
 exportToMarkown =
     buttonTemplate [] ExportToMarkdown "Export to Markdown"
 
+
 exportToLaTeX : Element FrontendMsg
 exportToLaTeX =
     buttonTemplate [] ExportToLaTeX "Export to LaTeX"
-
 
 
 export : Element FrontendMsg
