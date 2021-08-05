@@ -188,6 +188,9 @@ updateFromFrontend sessionId clientId msg model =
                     if path_ == "/" then
                         "/s/jxxcarlson-welcome-to-l1-2021-07-29"
 
+                    else if path_ == "/guest" then
+                        "/g/jxxcarlson-welcome-to-l1-2021-07-29"
+
                     else
                         path_
             in
