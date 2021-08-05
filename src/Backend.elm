@@ -194,7 +194,7 @@ updateFromFrontend sessionId clientId msg model =
                     else
                         path_
             in
-            if String.left 3 path == "/g" then
+            if String.left 3 path == "/g/" then
                 signInAsGuestWithDoc model clientId path
 
             else if String.left 3 path == "/s/" then
